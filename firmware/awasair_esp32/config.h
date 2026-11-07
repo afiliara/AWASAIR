@@ -17,7 +17,6 @@
 #define DEFAULT_BAHAYA  240.0f  // cm (bisa diubah lewat cmd)
 #define HISTERESIS      5.0f    // cm
 #define INTERVAL_MS     5000UL  // publish `data` tiap 5 detik (kontrak: 5-10 detik)
-#define AWASSPEAK_INTERVAL_MS 15000UL
 
 // Kategori hujan (ADC, makin kecil makin basah). WAJIB dikalibrasi.
 #define ADC_KERING 4000

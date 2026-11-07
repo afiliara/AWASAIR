@@ -1,5 +1,5 @@
 // MiniChart: grafik garis deret waktu berbasis <canvas>, tanpa library eksternal.
-// Dipakai oleh AwasSpeak dan AwasLink.
+// Dipakai oleh konsol dan Data Logger AwasLink.
 //   const c = new MiniChart(canvasEl, { color:'#2a7de1', unit:'cm', lines:[{value:200,label:'Siaga',color:'#e0a800'}] })
 //   c.setData([{ t: Date|number|string, v: number }, ...])
 (function () {

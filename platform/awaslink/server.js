@@ -15,6 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { Aedes } from 'aedes';
 import { WebSocketServer, createWebSocketStream } from 'ws';
+import { createDatalog } from './datalog.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -34,6 +35,8 @@ const CFG = {
   // true: warga bisa melihat dashboard tanpa login (hanya-baca). Kontrol tetap butuh login.
   publicView: bool(process.env.PUBLIC_VIEW ?? fileCfg.publicView, true),
   historyDays: Number(process.env.HISTORY_DAYS || fileCfg.historyDays || 30),
+  // Data Logger (ala ThingSpeak): jeda minimum antar /update per channel, detik
+  rateLimitSec: Number(process.env.RATE_LIMIT_SEC ?? fileCfg.rateLimitSec ?? 5),
   dataDir: process.env.DATA_DIR || fileCfg.dataDir || path.join(__dirname, 'data'),
 };
 fs.mkdirSync(CFG.dataDir, { recursive: true });
@@ -67,6 +70,10 @@ function loadDevices() {
   devices.clear();
   for (const row of db.prepare('SELECT * FROM devices').all()) {
     const d = { ...row, config: JSON.parse(row.config), values: {}, online: false, evState: {} };
+    if (d.config.contract === 'awasair-v1' && !d.config.datalog) {
+      d.config.datalog = awasairTemplate().datalog;
+      db.prepare('UPDATE devices SET config=? WHERE id=?').run(JSON.stringify(d.config), d.id);
+    }
     for (const v of db.prepare('SELECT key, value, ts FROM latest WHERE device_id=?').all(row.id)) d.values[v.key] = { v: v.value, ts: v.ts };
     devices.set(row.id, d);
   }
@@ -88,6 +95,8 @@ function awasairTemplate() {
     contract: 'awasair-v1',
     useAck: true, // nilai pengaturan yang tampil = isi `ack` dari alat, bukan yang dikirim dashboard
     staleSeconds: 30,
+    // Data Logger: catat data MQTT ke channel 1 tiap 15 detik (field1 level, field2 adc, field3 kode status, field4 jarak)
+    datalog: { channel: 1, everySec: 15, fields: { level: 1, adc: 2, status_code: 3, jarak: 4 } },
     datastreams: [
       { key: 'level', name: 'Ketinggian Air', type: 'number', unit: 'cm', min: 0, max: 300, dir: 'in' },
       { key: 'jarak', name: 'Jarak Sensor', type: 'number', unit: 'cm', min: 0, max: 400, dir: 'in' },
@@ -366,6 +375,7 @@ broker.on('publish', (packet, client) => {
       const obj = JSON.parse(payload);
       for (const [k, v] of Object.entries(obj)) if (v !== null && typeof v !== 'object') setValue(d, k, v, sub === 'ack' ? 'ack' : 'device');
       if (sub === 'ack') { clearTimeout(d.ackTimer); broadcast({ t: 'ack', d: d.id, values: obj }); }
+      if (sub === 'data' && d.config.datalog) datalog.recordDevice(d.config.datalog, obj);
     } catch { console.warn(`[mqtt] payload ${packet.topic} bukan JSON valid`); }
     return;
   }
@@ -430,6 +440,7 @@ function isAdmin(req) {
   return true;
 }
 const canView = (req) => CFG.publicView || isAdmin(req);
+const datalog = createDatalog({ db, isAdmin, rateLimitSec: CFG.rateLimitSec });
 
 function send(res, status, body, type = 'application/json; charset=utf-8', extra = {}) {
   res.writeHead(status, { 'Content-Type': type, 'Cache-Control': 'no-store', 'Access-Control-Allow-Origin': '*', ...extra });
@@ -478,7 +489,7 @@ route('POST', /^\/api\/login$/, async (req, res) => {
   send(res, 200, { ok: true }, 'application/json', { 'Set-Cookie': `al_sid=${sid}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${SESSION_TTL / 1000}` });
 });
 route('POST', /^\/api\/logout$/, (req, res) => { sessions.delete(parseCookies(req).al_sid); send(res, 200, { ok: true }, 'application/json', { 'Set-Cookie': 'al_sid=; Path=/; Max-Age=0' }); });
-route('GET', /^\/api\/me$/, (req, res) => json(res, { admin: isAdmin(req), user: isAdmin(req) ? CFG.adminUser : null, publicView: CFG.publicView, mqttPort: CFG.mqttPort, httpPort: CFG.httpPort }));
+route('GET', /^\/api\/me$/, (req, res) => json(res, { admin: isAdmin(req), user: isAdmin(req) ? CFG.adminUser : null, publicView: CFG.publicView, mqttPort: CFG.mqttPort, httpPort: CFG.httpPort, rateLimitSec: CFG.rateLimitSec }));
 
 // Perangkat
 route('GET', /^\/api\/devices$/, viewer((req, res) => json(res, [...devices.values()].map((d) => publicDevice(d, isAdmin(req))))));
@@ -590,7 +601,7 @@ route('GET', /^\/external\/api\/isHardwareConnected$/, (req, res, q) => {
 const MIME = { '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8', '.md': 'text/plain; charset=utf-8', '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png' };
 function serveStatic(res, pathname) {
   const pub = path.join(__dirname, 'public');
-  if (pathname === '/console') { res.writeHead(301, { Location: '/console/' }); return res.end(); }
+  if (pathname === '/console' || pathname === '/data') { res.writeHead(301, { Location: pathname + '/' }); return res.end(); }
   let f = path.normalize(path.join(pub, decodeURIComponent(pathname)));
   if (!f.startsWith(pub)) return fail(res, 403, 'Forbidden');
   if (fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, 'index.html');
@@ -611,6 +622,7 @@ const server = http.createServer(async (req, res) => {
       const m = url.pathname.match(r.p);
       if (m) return await r.h(req, res, q, m);
     }
+    if (await datalog.handle(req, res, url)) return; // API & halaman Data Logger (ala ThingSpeak)
     if (req.method === 'GET') return serveStatic(res, url.pathname);
     fail(res, 404, 'Tidak ditemukan');
   } catch (e) {
@@ -654,6 +666,10 @@ net.createServer(broker.handle).listen(CFG.mqttPort, () => {
 });
 server.listen(CFG.httpPort, () => {
   console.log(`  AwasLink dashboard    : http://localhost:${CFG.httpPort}`);
+  console.log(`  Konsol teknisi        : http://localhost:${CFG.httpPort}/console/`);
+  console.log(`  Data Logger (ala ThingSpeak): http://localhost:${CFG.httpPort}/data/`);
+  const ch1 = datalog.getChannel(1);
+  if (ch1) console.log(`  Channel #1 write key  : ${ch1.write_key}`);
   console.log(`  Login admin           : ${CFG.adminUser} / ${CFG.adminPass === 'admin123' ? 'admin123 (GANTI lewat ADMIN_PASS!)' : '********'}`);
   for (const d of devices.values()) console.log(`  Perangkat "${d.name}"  : topic ${d.topic}/...  token ${d.token}`);
   console.log('');

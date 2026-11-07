@@ -12,7 +12,3 @@
 #define MQTT_USER      "device"
 #define MQTT_PASS      "TEMPEL_AUTH_TOKEN_AWASLINK"   // AwasLink > Konsol > Info & Koneksi
 
-// --- AwasSpeak (opsional, mirip ThingSpeak) ---
-#define ENABLE_AWASSPEAK    1                          // 0 = tidak kirim ke AwasSpeak
-#define AWASSPEAK_URL       "http://192.168.1.10:3001"
-#define AWASSPEAK_WRITE_KEY "TEMPEL_WRITE_KEY_AWASSPEAK"

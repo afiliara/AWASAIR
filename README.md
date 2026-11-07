@@ -10,9 +10,8 @@ backend/                Node.js: subscriber MQTT, SQLite, REST API, melayani das
   scripts/simulator.js    Peniru ESP32
 frontend/               Dashboard (HTML/JS, MQTT over WebSocket, Chart.js)
 firmware/awasair_esp32/ Firmware ESP32 (sesuai kontrak MQTT v1)
-platform/               Platform IoT buatan sendiri, lihat platform/README.md
-  awaslink/               Mirip Blynk: broker MQTT + dashboard real-time (desain UI v5) + kontrol + notifikasi
-  awasspeak/              Mirip ThingSpeak: channel, API key, riwayat, grafik, ekspor CSV
+platform/awaslink/      Platform IoT buatan sendiri (pengganti Blynk + ThingSpeak), lihat platform/README.md:
+                          broker MQTT, dashboard warga (desain UI v5), konsol teknisi, Data Logger + API ThingSpeak
 ```
 
 ## Menjalankan (tanpa hardware)
@@ -32,7 +31,7 @@ Simulator: `npm run sim -- --scenario=normal|siaga|bahaya|error|siklus --interva
 
 Tes logika: `npm test`
 
-Platform AwasLink dan AwasSpeak dijalankan terpisah, lihat [platform/README.md](platform/README.md).
+Platform AwasLink dijalankan terpisah, lihat [platform/README.md](platform/README.md).
 
 ## Alur data
 ```

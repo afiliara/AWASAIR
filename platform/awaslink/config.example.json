@@ -4,5 +4,6 @@
   "adminUser": "admin",
   "adminPass": "ganti-password-ini",
   "publicView": true,
-  "historyDays": 30
+  "historyDays": 30,
+  "rateLimitSec": 5
 }

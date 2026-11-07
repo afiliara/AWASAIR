@@ -590,6 +590,7 @@
       const r = await Notification.requestPermission();
       toast(r === "granted" ? "Notifikasi browser aktif. Peringatan muncul selama halaman ini terbuka." : "Izin notifikasi ditolak.");
     } else if (action === "console") location.href = "/console/";
+    else if (action === "data") location.href = "/data/";
     else if (action === "help") toast("Status dihitung oleh alat (ESP32). Abu-abu berarti data tidak tersedia, bukan aman.");
   });
   document.addEventListener("click", (e) => { if (!profileMenu.hidden && !e.target.closest(".profile")) setMenu(false); });

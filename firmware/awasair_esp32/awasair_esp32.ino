@@ -7,7 +7,7 @@
  *   publish  awasair/sungai/online  online / offline (Last Will)  retained
  *   publish  awasair/sungai/ack     {"mute","siaga","bahaya"} yang BERLAKU  retained, saat boot + setelah cmd
  *   subscribe awasair/sungai/cmd    {"mute":true} / {"siaga":200,"bahaya":240}
- * Opsional: kirim juga ke AwasSpeak (mirip ThingSpeak) lewat HTTP GET /update.
+ * Server AwasLink otomatis mencatat `data` ke Data Logger (ala ThingSpeak), jadi cukup MQTT.
  *
  * Library (Arduino IDE > Library Manager):
  *   PubSubClient (Nick O'Leary), LiquidCrystal I2C (Frank de Brabander), ArduinoJson 7.x
@@ -17,7 +17,6 @@
  * Logika keselamatan (status + buzzer) berjalan di sini, tetap jalan walau WiFi/server mati.
  */
 #include <WiFi.h>
-#include <HTTPClient.h>
 #include <PubSubClient.h>
 #include <LiquidCrystal_I2C.h>
 #include <ArduinoJson.h>
@@ -51,7 +50,7 @@ bool statusDikenal = false;  // false sampai pengukuran pertama
 bool statusPerluKirim = true;
 const char* STATUS_STR[] = {"NORMAL", "SIAGA", "BAHAYA", "ERROR"};
 
-unsigned long tUkur = 0, tSpeak = 0, tMqttRetry = 0, tWifiRetry = 0;
+unsigned long tUkur = 0, tMqttRetry = 0, tWifiRetry = 0;
 char clientId[32];
 
 // ---------------------------------------------------------------- Sensor
@@ -203,24 +202,6 @@ void connectMqtt() {
   }
 }
 
-// ---------------------------------------------------------------- HTTP (AwasSpeak, opsional)
-void kirimAwasSpeak() {
-#if ENABLE_AWASSPEAK
-  if (WiFi.status() != WL_CONNECTED) return;
-  int kode = status == ERR ? -1 : (int)status;
-  String url = String(AWASSPEAK_URL) + "/update?api_key=" + AWASSPEAK_WRITE_KEY +
-               "&field2=" + String(rainAdc) + "&field3=" + String(kode) + "&status=" + STATUS_STR[status];
-  if (!isnan(levelCm)) url += "&field1=" + String(levelCm, 1) + "&field4=" + String(jarakCm, 1);
-  HTTPClient http;
-  http.setTimeout(4000);
-  http.begin(url);
-  int code = http.GET();
-  String body = code > 0 ? http.getString() : http.errorToString(code);
-  http.end();
-  Serial.printf("[awasspeak] HTTP %d, entry %s\n", code, body.c_str());  // "0" = ditolak (key salah / terlalu cepat)
-#endif
-}
-
 // ---------------------------------------------------------------- WiFi
 void jagaWifi() {
   if (WiFi.status() == WL_CONNECTED || millis() - tWifiRetry < 10000) return;
@@ -275,9 +256,5 @@ void loop() {
     publishData();
     Serial.printf("level=%.1f cm  jarak=%.1f cm  adc=%d (%s)  status=%s%s\n", levelCm, jarakCm, rainAdc, kategoriHujan,
                   STATUS_STR[status], buzzerMute ? " [mute]" : "");
-  }
-  if (now - tSpeak >= AWASSPEAK_INTERVAL_MS) {
-    tSpeak = now;
-    kirimAwasSpeak();
   }
 }

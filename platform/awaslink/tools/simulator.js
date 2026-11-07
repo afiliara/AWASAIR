@@ -1,11 +1,11 @@
-// Simulator ESP32 AWASAIR untuk AwasLink (+ opsional AwasSpeak), mengikuti docs/mqtt-contract.md.
+// Simulator ESP32 AWASAIR untuk AwasLink, mengikuti docs/mqtt-contract.md.
+// Data otomatis ikut tercatat di Data Logger (channel 1) oleh server.
 // Logika status/histeresis sama dengan backend/src/contract.js dan firmware.
 //
 //   node tools/simulator.js --token <TOKEN_AWASLINK>
-//   node tools/simulator.js --token <TOKEN> --speak http://localhost:3000 --speak-key <WRITE_KEY>
 //
 // Opsi: --host localhost --port 1883 --topic awasair/sungai --interval 5
-//       --scenario siklus|normal|siaga|bahaya|error   --speak-every 15
+//       --scenario siklus|normal|siaga|bahaya|error
 import mqtt from 'mqtt';
 
 const args = {};
@@ -21,8 +21,6 @@ const TOKEN = args.token || process.env.AWASLINK_TOKEN;
 const BASE = args.topic || 'awasair/sungai';
 const INTERVAL = Number(args.interval || 5);
 const SCENARIO = args.scenario || 'siklus';
-const SPEAK = args.speak; const SPEAK_KEY = args['speak-key'];
-const SPEAK_EVERY = Number(args['speak-every'] || 15) * 1000;
 const TINGGI_PASANG = 300; const HIST = 5;
 
 if (!TOKEN) { console.error('Wajib isi --token <auth token perangkat dari AwasLink>'); process.exit(1); }
@@ -85,8 +83,7 @@ client.on('message', (topic, payload) => {
   pub(T.ack, cfg, { qos: 1, retain: true });
 });
 
-let lastSpeak = 0;
-async function tick() {
+function tick() {
   if (!client.connected) return;
   nextValues();
   const hujan = kategoriHujan(adc);
@@ -96,14 +93,6 @@ async function tick() {
   else pub(T.data, { adc, hujan, status });
   console.log(`[sim] ${status.padEnd(6)} level=${Number.isFinite(level) ? level.toFixed(1) : '-'} adc=${adc} ${hujan}${cfg.mute ? ' [mute]' : ''}`);
 
-  if (SPEAK && SPEAK_KEY && Date.now() - lastSpeak >= SPEAK_EVERY) {
-    lastSpeak = Date.now();
-    const code = { NORMAL: 0, SIAGA: 1, BAHAYA: 2, ERROR: -1 }[status];
-    const q = new URLSearchParams({ api_key: SPEAK_KEY, field2: adc, field3: code, status });
-    if (Number.isFinite(level)) { q.set('field1', level.toFixed(1)); q.set('field4', (TINGGI_PASANG - level).toFixed(1)); }
-    try { const r = await fetch(`${SPEAK}/update?${q}`); console.log(`[sim] AwasSpeak entry ${await r.text()}`); }
-    catch (e) { console.error('[sim] AwasSpeak gagal:', e.message); }
-  }
 }
 setInterval(tick, INTERVAL * 1000);
 

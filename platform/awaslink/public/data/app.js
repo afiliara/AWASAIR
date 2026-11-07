@@ -1,4 +1,4 @@
-// AwasSpeak - frontend (SPA, hash routing, tanpa framework)
+// AwasLink Data Logger (fitur ala ThingSpeak) - frontend (SPA, hash routing, tanpa framework)
 const $ = (s, el = document) => el.querySelector(s);
 const app = $('#app');
 const FIELDS = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -54,7 +54,7 @@ async function loadMe() {
 function showLogin() {
   const bg = document.createElement('div'); bg.className = 'modal-bg';
   bg.innerHTML = `<form class="card modal">
-    <h3>Login admin AwasSpeak</h3>
+    <h3>Login admin AwasLink</h3>
     <div class="f"><label>Username</label><input type="text" name="username" autocomplete="username" required></div>
     <div class="f"><label>Password</label><input type="password" name="password" autocomplete="current-password" required></div>
     <p class="hint" id="err"></p>
@@ -351,7 +351,7 @@ function tabEdit(el, ch) {
 async function viewSettings() {
   if (!ME.admin) { app.innerHTML = '<div class="card empty">Login admin untuk membuka pengaturan.</div>'; return; }
   const s = await api('GET', '/api/settings');
-  app.innerHTML = `<h1>Pengaturan</h1><p class="sub">Pengaturan server AwasSpeak.</p>
+  app.innerHTML = `<h1>Pengaturan</h1><p class="sub">Pengaturan Data Logger. Token Telegram juga bisa diatur di <a href="/console/#/settings">Konsol</a>.</p>
     <form class="card" id="f" style="max-width:620px"><h3>Bot Telegram (untuk React)</h3>
       <p class="hint">Buat bot lewat <b>@BotFather</b> di Telegram, salin tokennya ke sini. Kirim pesan apa saja ke bot, lalu buka
       <code>https://api.telegram.org/bot&lt;TOKEN&gt;/getUpdates</code> untuk melihat <b>chat id</b> kalian.</p>
@@ -381,7 +381,7 @@ function viewDocs() {
     ['GET', '/channels/:id/stream', 'Server-Sent Events: data baru dikirim real-time (event "feed").'],
   ];
   app.innerHTML = `<h1>Dokumentasi API</h1>
-    <p class="sub">API AwasSpeak mengikuti pola ThingSpeak, jadi contoh kode/library ThingSpeak biasanya bisa dipakai dengan mengganti alamat server. Channel privat butuh <code>api_key</code> (Read atau Write key), bisa juga lewat header <code>X-THINGSPEAKAPIKEY</code>.</p>
+    <p class="sub">API Data Logger AwasLink mengikuti pola ThingSpeak, jadi contoh kode/library ThingSpeak biasanya bisa dipakai dengan mengganti alamat server. Channel privat butuh <code>api_key</code> (Read atau Write key), bisa juga lewat header <code>X-THINGSPEAKAPIKEY</code>.</p>
     <div class="card table-wrap"><table><thead><tr><th>Metode</th><th>Endpoint</th><th>Keterangan</th></tr></thead><tbody>
       ${rows.map((r) => `<tr><td><code>${r[0]}</code></td><td><code>${esc(r[1])}</code></td><td>${esc(r[2])}</td></tr>`).join('')}</tbody></table></div>
     <h2>Contoh ESP32 (Arduino)</h2>

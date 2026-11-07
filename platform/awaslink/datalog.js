@@ -1,41 +1,14 @@
-// AwasSpeak - platform logging & visualisasi data IoT (mirip ThingSpeak)
-// Tanpa dependensi eksternal: hanya modul bawaan Node.js (>= 22.13).
-//
-// Jalankan:  npm start   (atau: node server.js)
-// Konfigurasi lewat environment variable atau file config.json (lihat config.example.json).
-
-import http from 'node:http';
+// Data Logger AwasLink: fitur ala ThingSpeak di dalam AwasLink.
+// - Channel 8 field dengan Write/Read API key
+// - API kompatibel ThingSpeak: /update, /channels/:id/feeds.json, .csv, fields, last, status, stream (SSE)
+// - Impor/ekspor CSV, React (aksi otomatis: log / webhook / Telegram)
+// - Data perangkat MQTT dicatat otomatis ke channel (lihat recordDevice)
+// Memakai database, login admin, dan port HTTP yang sama dengan AwasLink.
 import crypto from 'node:crypto';
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { DatabaseSync } from 'node:sqlite';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+export function createDatalog({ db, isAdmin, rateLimitSec = 5, maxResults = 8000 }) {
+const CFG = { rateLimitSec, maxResults };
 
-// ---------------------------------------------------------------------------
-// Konfigurasi
-// ---------------------------------------------------------------------------
-let fileCfg = {};
-const cfgPath = path.join(__dirname, 'config.json');
-if (fs.existsSync(cfgPath)) fileCfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
-
-const CFG = {
-  port: Number(process.env.PORT || fileCfg.port || 3001),
-  adminUser: process.env.ADMIN_USER || fileCfg.adminUser || 'admin',
-  adminPass: process.env.ADMIN_PASS || fileCfg.adminPass || 'admin123',
-  // Jeda minimum antar update per channel (detik). ThingSpeak gratis = 15 detik.
-  rateLimitSec: Number(process.env.RATE_LIMIT_SEC ?? fileCfg.rateLimitSec ?? 5),
-  dataDir: process.env.DATA_DIR || fileCfg.dataDir || path.join(__dirname, 'data'),
-  maxResults: 8000,
-};
-
-fs.mkdirSync(CFG.dataDir, { recursive: true });
-
-// ---------------------------------------------------------------------------
-// Database
-// ---------------------------------------------------------------------------
-const db = new DatabaseSync(path.join(CFG.dataDir, 'awasspeak.db'));
 db.exec(`
 PRAGMA journal_mode = WAL;
 CREATE TABLE IF NOT EXISTS channels (
@@ -113,11 +86,6 @@ if (db.prepare('SELECT COUNT(*) n FROM channels').get().n === 0) {
 // ---------------------------------------------------------------------------
 // Utilitas HTTP
 // ---------------------------------------------------------------------------
-const MIME = {
-  '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png',
-  '.ico': 'image/x-icon', '.json': 'application/json',
-};
 
 function send(res, status, body, type = 'application/json; charset=utf-8', extra = {}) {
   const data = typeof body === 'string' || Buffer.isBuffer(body) ? body : JSON.stringify(body);
@@ -170,25 +138,6 @@ function parseCookies(req) {
     if (i > 0) out[p.slice(0, i).trim()] = decodeURIComponent(p.slice(i + 1).trim());
   });
   return out;
-}
-
-// ---------------------------------------------------------------------------
-// Sesi admin (disimpan di memori)
-// ---------------------------------------------------------------------------
-const sessions = new Map();
-const SESSION_TTL = 7 * 24 * 3600 * 1000;
-
-function isAdmin(req) {
-  const sid = parseCookies(req).as_sid;
-  const s = sid && sessions.get(sid);
-  if (!s) return false;
-  if (s.exp < Date.now()) { sessions.delete(sid); return false; }
-  return true;
-}
-
-function safeEqual(a, b) {
-  const ba = Buffer.from(String(a)); const bb = Buffer.from(String(b));
-  return ba.length === bb.length && crypto.timingSafeEqual(ba, bb);
 }
 
 function apiKeyFrom(req, params) {
@@ -468,21 +417,7 @@ route('GET', /^\/channels\/(\d+)\/stream$/, withReadableChannel((req, res, p, m,
   req.on('close', () => { clearInterval(ping); streams.get(ch.id)?.delete(res); });
 }));
 
-// ---- API manajemen (dashboard) ---------------------------------------------
-route('POST', /^\/api\/login$/, (req, res, p) => {
-  if (!(safeEqual(p.username || '', CFG.adminUser) && safeEqual(p.password || '', CFG.adminPass))) return fail(res, 401, 'Username atau password salah');
-  const sid = crypto.randomBytes(24).toString('hex');
-  sessions.set(sid, { user: CFG.adminUser, exp: Date.now() + SESSION_TTL });
-  send(res, 200, { ok: true, user: CFG.adminUser }, 'application/json', {
-    'Set-Cookie': `as_sid=${sid}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${SESSION_TTL / 1000}`,
-  });
-});
-route('POST', /^\/api\/logout$/, (req, res) => {
-  sessions.delete(parseCookies(req).as_sid);
-  send(res, 200, { ok: true }, 'application/json', { 'Set-Cookie': 'as_sid=; Path=/; Max-Age=0' });
-});
-route('GET', /^\/api\/me$/, (req, res) => json(res, { admin: isAdmin(req), user: isAdmin(req) ? CFG.adminUser : null, rateLimitSec: CFG.rateLimitSec }));
-
+// ---- API manajemen (halaman Data Logger) -----------------------------------
 route('GET', /^\/api\/channels$/, (req, res) => {
   const admin = isAdmin(req);
   const rows = db.prepare(`SELECT * FROM channels ${admin ? '' : 'WHERE public = 1'} ORDER BY id`).all();
@@ -593,54 +528,48 @@ route('DELETE', /^\/api\/reacts\/(\d+)$/, adminOnly((req, res, p, m) => {
   json(res, { ok: true });
 }));
 
-route('GET', /^\/api\/settings$/, adminOnly((req, res) => json(res, { telegram_token: getSetting('telegram_token') ? '********' : '' })));
-route('PUT', /^\/api\/settings$/, adminOnly((req, res, p) => {
-  if (p.telegram_token !== undefined && p.telegram_token !== '********') setSetting('telegram_token', String(p.telegram_token).trim());
-  json(res, { ok: true });
-}));
 
 // ---------------------------------------------------------------------------
-// Server
+// Antarmuka untuk server AwasLink
 // ---------------------------------------------------------------------------
-function serveStatic(req, res, pathname) {
-  const publicDir = path.join(__dirname, 'public');
-  let file = path.normalize(path.join(publicDir, pathname === '/' ? 'index.html' : pathname));
-  if (!file.startsWith(publicDir)) return fail(res, 403, 'Forbidden');
-  if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(publicDir, 'index.html');
-  res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream' });
-  fs.createReadStream(file).pipe(res);
+async function handle(req, res, url) {
+  if (req.method === 'OPTIONS' && /^\/(update|channels\/)/.test(url.pathname)) {
+    res.writeHead(204, { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST', 'Access-Control-Allow-Headers': 'Content-Type,X-THINGSPEAKAPIKEY,X-API-KEY' });
+    res.end();
+    return true;
+  }
+  for (const r of routes) {
+    if (r.method !== req.method) continue;
+    const m = url.pathname.match(r.pattern);
+    if (!m) continue;
+    const params = await parseParams(req, url);
+    await r.handler(req, res, params, m);
+    return true;
+  }
+  return false;
 }
 
-const server = http.createServer(async (req, res) => {
-  try {
-    const url = new URL(req.url, 'http://localhost');
-    if (req.method === 'OPTIONS') {
-      res.writeHead(204, { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE', 'Access-Control-Allow-Headers': 'Content-Type,X-THINGSPEAKAPIKEY,X-API-KEY' });
-      return res.end();
-    }
-    for (const r of routes) {
-      if (r.method !== req.method) continue;
-      const m = url.pathname.match(r.pattern);
-      if (!m) continue;
-      const params = await parseParams(req, url);
-      return await r.handler(req, res, params, m);
-    }
-    if (req.method === 'GET') return serveStatic(req, res, url.pathname);
-    fail(res, 404, 'Tidak ditemukan');
-  } catch (e) {
-    console.error(e);
-    if (!res.headersSent) fail(res, 500, e.message);
-  }
-});
+// Catat data perangkat MQTT ke channel.
+// map = { channel: 1, everySec: 15, fields: { level: 1, adc: 2, status_code: 3, jarak: 4 } }
+const lastRecord = new Map();
+const STATUS_CODE = { NORMAL: 0, SIAGA: 1, BAHAYA: 2, ERROR: -1 };
+function recordDevice(map, values) {
+  const ch = map && getChannel(map.channel);
+  if (!ch) return null;
+  const now = Date.now();
+  if (now - (lastRecord.get(ch.id) || 0) < (map.everySec ?? 15) * 1000) return null;
+  const src = { ...values };
+  const st = String(src.status ?? '').toUpperCase();
+  if (st in STATUS_CODE) src.status_code = STATUS_CODE[st];
+  const params = {};
+  for (const [key, n] of Object.entries(map.fields || {})) if (src[key] !== undefined && src[key] !== null) params['field' + n] = src[key];
+  if (src.status !== undefined) params.status = src.status;
+  const r = insertFeed(ch, params, { skipRateLimit: true });
+  if (!r.row) return null;
+  lastRecord.set(ch.id, now);
+  afterInsert(ch, r.row);
+  return r.row.entry_id;
+}
 
-server.listen(CFG.port, () => {
-  const ch = getChannel(1);
-  console.log(`\n  AwasSpeak berjalan di http://localhost:${CFG.port}`);
-  console.log(`  Login admin : ${CFG.adminUser} / ${CFG.adminPass === 'admin123' ? 'admin123 (GANTI lewat ADMIN_PASS!)' : '********'}`);
-  console.log(`  Rate limit  : ${CFG.rateLimitSec} detik per channel`);
-  if (ch) {
-    console.log(`  Channel #1  : ${ch.name}`);
-    console.log(`  Write key   : ${ch.write_key}`);
-    console.log(`  Contoh      : http://localhost:${CFG.port}/update?api_key=${ch.write_key}&field1=150&field2=3800&field3=0\n`);
-  }
-});
+return { handle, recordDevice, getChannel, rateLimitSec: CFG.rateLimitSec };
+}
