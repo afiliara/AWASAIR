@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AWASAIR</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div>
+        <h1>AWASAIR</h1>
+        <p id="lokasi" class="muted"></p>
+      </div>
+    </div>
+    <div class="conn" aria-live="polite">
+      <span id="connDot" class="dot dot-off"></span>
+      <span id="connText">Menghubungkan…</span>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="beranda" aria-selected="true">Beranda</button>
+    <button role="tab" data-tab="grafik" aria-selected="false">Grafik</button>
+    <button role="tab" data-tab="notifikasi" aria-selected="false">Notifikasi</button>
+    <button role="tab" data-tab="pengaturan" aria-selected="false">Pengaturan</button>
+  </nav>
+
+  <main>
+    <!-- BERANDA -->
+    <section id="tab-beranda" class="tab">
+      <div id="hero" class="hero st-unknown">
+        <div class="hero-status">
+          <span class="label">Status sungai</span>
+          <strong id="statusText">TIDAK ADA DATA</strong>
+          <span id="statusNote" class="muted">Menunggu data dari sensor</span>
+        </div>
+        <div class="hero-level">
+          <span class="label">Ketinggian air</span>
+          <div><strong id="levelValue">–</strong><span class="unit"> cm</span></div>
+        </div>
+      </div>
+
+      <div id="alertBox" class="alert" hidden></div>
+
+      <div class="card">
+        <div class="gauge" id="gauge" role="img" aria-label="Ketinggian air terhadap ambang">
+          <div class="gauge-fill" id="gaugeFill"></div>
+          <div class="gauge-mark mark-siaga" id="markSiaga"><span>Siaga</span></div>
+          <div class="gauge-mark mark-bahaya" id="markBahaya"><span>Bahaya</span></div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <span class="label">Kondisi hujan</span>
+          <strong id="hujanText" class="big">–</strong>
+          <span id="adcText" class="muted">ADC –</span>
+        </div>
+        <div class="card">
+          <span class="label">Pembaruan terakhir</span>
+          <strong id="ageText" class="big">–</strong>
+          <span id="timeText" class="muted">–</span>
+        </div>
+        <div class="card">
+          <span class="label">Jarak sensor ke air</span>
+          <strong id="jarakText" class="big">–</strong>
+          <span class="muted">cm</span>
+        </div>
+        <div class="card">
+          <span class="label">Buzzer</span>
+          <strong id="buzzerText" class="big">–</strong>
+          <span class="muted">dari konfigurasi perangkat</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Notifikasi terbaru</h2>
+        <ul id="recentEvents" class="events"></ul>
+      </div>
+    </section>
+
+    <!-- GRAFIK -->
+    <section id="tab-grafik" class="tab" hidden>
+      <div class="card">
+        <div class="row">
+          <h2>Riwayat</h2>
+          <div class="range" id="range">
+            <button data-min="15">15 mnt</button>
+            <button data-min="60" class="on">1 jam</button>
+            <button data-min="360">6 jam</button>
+            <button data-min="1440">24 jam</button>
+          </div>
+        </div>
+        <h3>Ketinggian air (cm)</h3>
+        <div class="chart"><canvas id="chartLevel"></canvas></div>
+        <h3>Hujan</h3>
+        <div class="chart chart-sm"><canvas id="chartHujan"></canvas></div>
+        <p id="chartNote" class="muted"></p>
+      </div>
+    </section>
+
+    <!-- NOTIFIKASI -->
+    <section id="tab-notifikasi" class="tab" hidden>
+      <div class="card">
+        <h2>Peringatan dan perubahan status</h2>
+        <ul id="allEvents" class="events"></ul>
+      </div>
+    </section>
+
+    <!-- PENGATURAN -->
+    <section id="tab-pengaturan" class="tab" hidden>
+      <form id="settingsForm" class="card" novalidate>
+        <h2>Ambang batas</h2>
+        <p class="muted">Nilai yang tampil adalah yang sedang berlaku di perangkat. Perubahan baru berlaku setelah perangkat mengonfirmasi.</p>
+        <label>Siaga mulai dari (cm)
+          <input id="inSiaga" type="number" step="1" min="1" required>
+        </label>
+        <label>Bahaya mulai dari (cm)
+          <input id="inBahaya" type="number" step="1" min="1" required>
+        </label>
+        <p id="formError" class="error" hidden></p>
+        <button type="submit" id="btnSave" class="btn">Kirim ke perangkat</button>
+
+        <h2>Buzzer</h2>
+        <label class="switch">
+          <input id="inMute" type="checkbox">
+          <span>Bisukan buzzer</span>
+        </label>
+        <p class="muted">Status tetap dihitung dan LCD tetap menyala saat dibisukan.</p>
+        <p id="saveStatus" class="muted" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

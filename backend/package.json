@@ -1,0 +1,24 @@
+{
+  "name": "awasair-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Backend AWASAIR: subscriber MQTT, penyimpan riwayat, REST API",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "broker": "node scripts/dev-broker.js",
+    "sim": "node scripts/simulator.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "dependencies": {
+    "aedes": "^1.2.0",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "mqtt": "^5.16.1",
+    "ws": "^8.22.1"
+  }
+}
