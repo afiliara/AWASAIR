@@ -1,0 +1,9 @@
+{
+  "name": "AWASAIR - Peringatan Dini Banjir",
+  "short_name": "AWASAIR",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3f7fd",
+  "theme_color": "#0b2c59",
+  "icons": [{ "src": "/assets/logo-awasair.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

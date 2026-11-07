@@ -9,7 +9,9 @@ backend/                Node.js: subscriber MQTT, SQLite, REST API, melayani das
   scripts/dev-broker.js   Broker lokal untuk pengembangan (pengganti Mosquitto)
   scripts/simulator.js    Peniru ESP32
 frontend/               Dashboard (HTML/JS, MQTT over WebSocket, Chart.js)
-firmware/               (belum dibuat) ESP32
+firmware/awasair_esp32/ Firmware ESP32 (sesuai kontrak MQTT v1)
+platform/awaslink/      Platform IoT buatan sendiri (pengganti Blynk + ThingSpeak), lihat platform/README.md:
+                          broker MQTT, dashboard warga (desain UI v5), konsol teknisi, Data Logger + API ThingSpeak
 ```
 
 ## Menjalankan (tanpa hardware)
@@ -29,6 +31,8 @@ Simulator: `npm run sim -- --scenario=normal|siaga|bahaya|error|siklus --interva
 
 Tes logika: `npm test`
 
+Platform AwasLink dijalankan terpisah, lihat [platform/README.md](platform/README.md).
+
 ## Alur data
 ```
 ESP32/simulator → broker ─┬→ backend → SQLite → /api/readings, /api/events, /api/state
@@ -42,7 +46,6 @@ dashboard → cmd → broker → ESP32 → ack → dashboard   (nilai tampil = y
 - Logika status (ambang, histeresis 5 cm) ada di `backend/src/contract.js` dan harus sama dengan firmware.
 
 ## Belum dikerjakan
-- Firmware ESP32 (`firmware/`)
-- Mosquitto + TLS + ACL untuk produksi (broker dev tidak punya autentikasi)
-- Notifikasi HP (`backend/src/notifier.js` masih stub)
+- Mosquitto + TLS + ACL untuk produksi (broker dev tidak punya autentikasi; broker AwasLink memakai token per perangkat)
+- Notifikasi HP di `backend/src/notifier.js` masih stub (AwasLink sudah punya notifikasi browser dan Telegram)
 - Kalibrasi tinggi pasang, ambang, dan ADC hujan di lokasi

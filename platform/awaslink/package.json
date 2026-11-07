@@ -1,0 +1,20 @@
+{
+  "name": "awaslink",
+  "version": "1.0.0",
+  "description": "AwasLink - platform dashboard & kontrol IoT real-time (mirip Blynk) dengan broker MQTT bawaan, untuk proyek AWASAIR",
+  "type": "module",
+  "main": "server.js",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --no-warnings=ExperimentalWarning server.js",
+    "simulator": "node tools/simulator.js"
+  },
+  "dependencies": {
+    "aedes": "^1.2.0",
+    "mqtt": "^5.16.1",
+    "ws": "^8.22.1"
+  },
+  "license": "MIT"
+}

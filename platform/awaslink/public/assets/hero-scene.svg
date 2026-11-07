@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 260" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a80cb"/><stop offset=".55" stop-color="#86c0ee"/><stop offset="1" stop-color="#cde7fb"/></linearGradient>
+    <linearGradient id="lake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#58a4e4"/><stop offset="1" stop-color="#1d5fab"/></linearGradient>
+    <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f6a73"/><stop offset="1" stop-color="#0f3c55"/></linearGradient>
+  </defs>
+  <rect width="1200" height="260" fill="url(#sky)"/>
+  <g fill="#fff" opacity=".42"><ellipse cx="430" cy="52" rx="72" ry="12"/><ellipse cx="480" cy="44" rx="42" ry="11"/><ellipse cx="910" cy="40" rx="92" ry="12"/><ellipse cx="968" cy="33" rx="46" ry="10"/></g>
+  <path d="M0 150L120 96L210 128L330 72L450 124L560 88L700 130L820 92L960 126L1080 98L1200 118V260H0Z" fill="#7aaad8" opacity=".8"/>
+  <path d="M0 166L140 120L260 150L380 110L520 152L660 122L800 158L940 128L1080 152L1200 136V260H0Z" fill="#4f84bd"/>
+  <path d="M0 116C60 88 130 70 210 94C280 116 330 140 386 172V260H0Z" fill="url(#hill)"/>
+  <g fill="#17565f"><circle cx="40" cy="104" r="16"/><circle cx="78" cy="92" r="18"/><circle cx="120" cy="84" r="17"/><circle cx="162" cy="86" r="16"/><circle cx="204" cy="94" r="15"/><circle cx="246" cy="108" r="15"/><circle cx="288" cy="124" r="14"/><circle cx="330" cy="142" r="13"/></g>
+  <path d="M840 176C900 152 980 142 1060 150C1120 156 1168 150 1200 146V260H840Z" fill="#22636e"/>
+  <g fill="#1b5661"><circle cx="880" cy="166" r="12"/><circle cx="930" cy="154" r="14"/><circle cx="985" cy="148" r="13"/><circle cx="1040" cy="150" r="14"/><circle cx="1100" cy="152" r="12"/><circle cx="1160" cy="148" r="13"/></g>
+  <rect y="172" width="1200" height="88" fill="url(#lake)"/>
+  <g stroke="#eaf5ff" stroke-linecap="round" opacity=".38" stroke-width="3"><path d="M420 196h90M560 210h140M760 192h70M470 228h120M690 238h90M880 214h110M300 244h80"/></g>
+</svg>

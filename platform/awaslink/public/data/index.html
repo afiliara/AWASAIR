@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data Logger · AwasLink</title>
+  <link rel="stylesheet" href="/data/app.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%231f7a8c'/%3E%3Cpath d='M3 11l3-4 3 2 4-5' stroke='white' stroke-width='1.8' fill='none'/%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="top">
+    <div class="in">
+      <a class="brand" href="#/"><span class="dot">~</span> AwasLink Data</a>
+      <nav class="main" id="nav">
+        <a href="#/" data-r="home">Channels</a>
+        <a href="#/docs" data-r="docs">Dokumentasi API</a>
+        <a href="/">Dashboard</a>
+        <a href="/console/" class="admin-only" hidden>Konsol</a>
+      </nav>
+      <div id="auth"></div>
+    </div>
+  </header>
+  <main id="app"></main>
+  <script src="/data/chart.js"></script>
+  <script src="/data/app.js"></script>
+</body>
+</html>

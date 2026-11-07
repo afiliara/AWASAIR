@@ -1,0 +1,9 @@
+{
+  "httpPort": 8080,
+  "mqttPort": 1883,
+  "adminUser": "admin",
+  "adminPass": "ganti-password-ini",
+  "publicView": true,
+  "historyDays": 30,
+  "rateLimitSec": 5
+}

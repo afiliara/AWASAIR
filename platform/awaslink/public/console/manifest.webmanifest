@@ -1,0 +1,9 @@
+{
+  "name": "AwasLink - AWASAIR",
+  "short_name": "AwasLink",
+  "start_url": "/console/",
+  "display": "standalone",
+  "background_color": "#f4f6f9",
+  "theme_color": "#2b5fd9",
+  "icons": [{ "src": "/console/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
