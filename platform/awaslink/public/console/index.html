@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2b5fd9">
+  <title>AwasLink Konsol</title>
+  <link rel="manifest" href="/console/manifest.webmanifest">
+  <link rel="icon" href="/console/icon.svg">
+  <link rel="stylesheet" href="/console/app.css">
+</head>
+<body>
+  <header class="top">
+    <div class="in">
+      <a class="brand" href="#/"><img src="/console/icon.svg" width="24" height="24" alt=""> AwasLink</a>
+      <nav class="main" id="nav">
+        <a href="#/" data-r="home">Perangkat</a>
+        <a href="#/notif" data-r="notif">Notifikasi</a>
+        <a href="#/settings" data-r="settings" class="admin-only" hidden>Pengaturan</a>
+      </nav>
+      <span class="live" id="ws">offline</span>
+      <div id="auth"></div>
+    </div>
+  </header>
+  <main id="app"></main>
+  <script src="/console/chart.js"></script>
+  <script src="/console/app.js"></script>
+</body>
+</html>

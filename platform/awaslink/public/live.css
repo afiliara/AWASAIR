@@ -1,0 +1,18 @@
+/* Tambahan untuk versi terhubung (AwasLink). style.css asli dari tim UI/UX tidak diubah. */
+.hero-status[data-state="offline"] .state-icon,
+.hero-status[data-state="error"] .state-icon { background: #7b8aa3; box-shadow: 0 0 0 6px rgba(123, 138, 163, .28); }
+.buzzer-pill[data-tone="offline"] { background: rgba(15, 42, 82, .72); box-shadow: none; }
+.online-pill[data-off], .chip-off { background: #fde8eb; color: #c42a42; }
+.chip-off, .chip-wait { padding: 7px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.chip-wait { background: #fff4dc; color: #a26300; }
+.live-badge[data-off] { background: #fde8eb; color: #c42a42; }
+.live-badge[data-off] i { background: #ef4057; }
+.mqtt-card[data-off] .status-dot { background: #ff5d73; box-shadow: 0 0 0 4px rgba(255, 93, 115, .2); }
+.mqtt-card[data-off] strong { color: #ff8a9a; }
+.switch[disabled], .switch[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
+.login-dialog { border: 0; border-radius: 18px; padding: 22px; width: min(360px, calc(100vw - 32px)); box-shadow: 0 24px 60px rgba(12, 44, 89, .25); color: var(--ink); }
+.login-dialog::backdrop { background: rgba(8, 28, 56, .45); }
+.login-dialog h2 { margin: 0 0 4px; font-family: var(--font-head); font-size: 18px; }
+.login-dialog p { margin: 0 0 6px; color: var(--muted); font-size: 13px; }
+.login-dialog .row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+.btn-ghost { border: 1px solid var(--line); border-radius: 12px; padding: 11px 16px; background: #fff; color: var(--ink); font-weight: 700; font-size: 13px; }

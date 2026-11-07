@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b2c59">
+  <meta name="description" content="AWASAIR — sistem peringatan dini banjir dan luapan air berbasis IoT.">
+  <title>Beranda · AWASAIR</title>
+  <link rel="icon" href="assets/logo-awasair.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="live.css">
+  <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+  <!-- Sprite ikon dan logo (dipakai ulang lewat <use>) -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="awLogoG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fe1fc"/><stop offset=".32" stop-color="#33bdf7"/><stop offset=".62" stop-color="#2191f2"/><stop offset="1" stop-color="#1561da"/></linearGradient><clipPath id="awLogoC"><path d="M50 0.6C42 13 25 37.5 14.5 57C6 73 0 82 0.5 92C1.5 101 8 109.6 15.5 112.2C19.5 113.6 24 112.6 26 109.5L47 84L47 80.5L40 73L36 71.8L50 52.5L63.5 71.8L60.5 74L52.5 79.5L52.5 84L74 109.5C76 112.6 80.5 113.6 84.5 112.2C92 109.6 98.5 101 99.5 92C100 82 94 73 85.5 57C75 37.5 58 13 50 0.6Z"/></clipPath>
+    </defs>
+    <symbol id="logo-awasair" viewBox="0 0 100 113"><path d="M50 0.6C42 13 25 37.5 14.5 57C6 73 0 82 0.5 92C1.5 101 8 109.6 15.5 112.2C19.5 113.6 24 112.6 26 109.5L47 84L47 80.5L40 73L36 71.8L50 52.5L63.5 71.8L60.5 74L52.5 79.5L52.5 84L74 109.5C76 112.6 80.5 113.6 84.5 112.2C92 109.6 98.5 101 99.5 92C100 82 94 73 85.5 57C75 37.5 58 13 50 0.6Z" fill="url(#awLogoG)"/><g clip-path="url(#awLogoC)"><path d="M0 60C14 62 27 66 36 71.8L47 84V113H0Z" fill="#0a3fa6" opacity=".30"/><path d="M0 55C14 57 27 61.5 36 67.5V71.8C27 66 14 62 0 60Z" fill="#fff" opacity=".13"/><path d="M63.5 71.8C74 66 86 62.5 100 61V113H52.5V84Z" fill="#0a3fa6" opacity=".15"/><path d="M60.5 74L52.5 79.5L63.5 71.8Z" fill="#fff" opacity=".18"/></g><rect x="35.1" y="84.9" width="15" height="14" rx="3.6" fill="#a9dbff" opacity=".6" transform="rotate(-20 42.6 91.9)"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3.2 3 10.3V20a1 1 0 0 0 1 1h5.4v-6.2h5.2V21H20a1 1 0 0 0 1-1v-9.7L12 3.2Z"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3.5V20h16.5"/><path d="M8 16.5v-3.5M12 16.5v-6M16 16.5v-4.5"/><path d="m7.5 9.5 4-3.2 3 2 5-4.3"/></g></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.4a1.6 1.6 0 0 0-1.6 1.6v.7a6.6 6.6 0 0 0-5 6.4v4.1L3.8 17.6V19h16.4v-1.4l-1.6-2.4v-4.1a6.6 6.6 0 0 0-5-6.4V4A1.6 1.6 0 0 0 12 2.4Zm-2.4 17.8a2.5 2.5 0 0 0 4.8 0Z"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M19.27 9.80L22.02 10.07L22.02 13.93L19.27 14.20L18.70 15.59L20.45 17.72L17.72 20.45L15.59 18.70L14.20 19.27L13.93 22.02L10.07 22.02L9.80 19.27L8.41 18.70L6.28 20.45L3.55 17.72L5.30 15.59L4.73 14.20L1.98 13.93L1.98 10.07L4.73 9.80L5.30 8.41L3.55 6.28L6.28 3.55L8.41 5.30L9.80 4.73L10.07 1.98L13.93 1.98L14.20 4.73L15.59 5.30L17.72 3.55L20.45 6.28L18.70 8.41ZM15.1 12a3.1 3.1 0 1 0 -6.2 0a3.1 3.1 0 1 0 6.2 0Z"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2.6 9.2a13.6 13.6 0 0 1 18.8 0"/><path d="M5.7 12.5a9.2 9.2 0 0 1 12.6 0"/><path d="M8.8 15.7a4.7 4.7 0 0 1 6.4 0"/></g><circle cx="12" cy="19" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8.2" r="4"/><path d="M4.6 20.4c1.2-3.6 4.1-5.6 7.4-5.6s6.2 2 7.4 5.6"/></g></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.4" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 2.4v2.3M12 19.3v2.3M2.4 12h2.3M19.3 12h2.3M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" d="M12 5.8v8.2"/><circle cx="12" cy="18.6" r="1.8" fill="currentColor"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="m5.2 12.6 4.4 4.4 9.2-9.6"/></symbol>
+    <symbol id="i-siren" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.2 18v-4.8a4.8 4.8 0 0 1 9.6 0V18"/><path d="M5.2 18h13.6v2.6H5.2z"/><path d="M12 2.6v2M4.4 6l1.4 1.4M19.6 6l-1.4 1.4"/></g></symbol>
+    <symbol id="i-bell-off" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 11a5.8 5.8 0 0 1 9.4-4.6M17.8 11v4l1.6 2.4H8.6"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/><path d="M3.5 3.5l17 17"/></g></symbol>
+    <symbol id="i-waves" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7.5c1.5 0 1.5-1.3 3-1.3s1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3"/><path d="M3 12.5c1.5 0 1.5-1.3 3-1.3s1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3"/><path d="M3 17.5c1.5 0 1.5-1.3 3-1.3s1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3 1.5-1.3 3-1.3 1.5 1.3 3 1.3"/></g></symbol>
+    <symbol id="i-drop" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.8C9 7 5.8 10.2 5.8 13.7a6.2 6.2 0 0 0 12.4 0c0-3.5-3.2-6.7-6.2-10.9Z"/></symbol>
+    <symbol id="i-cloud-rain" viewBox="0 0 24 24"><path fill="currentColor" d="M7.1 15.6h9.6a3.9 3.9 0 0 0 .5-7.8 5.6 5.6 0 0 0-10.7 1.4 3.2 3.2 0 0 0 .6 6.4Z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="m8.6 18.3-.9 2M12.6 18.3l-.9 2M16.6 18.3l-.9 2"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M12 21.6s-6.6-6.3-6.6-11.4a6.6 6.6 0 0 1 13.2 0c0 5.1-6.6 11.4-6.6 11.4Zm0-8.9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="m9 5.8 6.2 6.2L9 18.2"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" d="m5.8 9 6.2 6.2L18.2 9"/></symbol>
+    <symbol id="i-gauge" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4.4l2.8 1.8M9.5 2.8h5"/></g></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 5.9v5.6c0 4.3 3 7.7 7 9.5 4-1.8 7-5.2 7-9.5V5.9L12 3Z"/><path d="m8.9 12.1 2.2 2.2 4.1-4.3"/></g></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3.5 17.5 5.6-5.6 3.8 3.8 7.6-7.6"/><path d="M15.2 8.1h5.3v5.3"/></g></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M12 19V5.5M6.5 11 12 5.5 17.5 11"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4.5h11.5l-2 4 2 4H5"/></g></symbol>
+    <symbol id="i-plug" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.8v4.4M15 2.8v4.4"/><path d="M6.5 7.2h11v3.6a5.5 5.5 0 0 1-11 0z"/><path d="M12 16.3v4.9"/></g></symbol>
+  </svg>
+
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Menu samping">
+      <a class="brand" href="#beranda" data-nav="beranda" aria-label="AWASAIR, ke Beranda">
+        <svg class="logo" aria-hidden="true"><use href="#logo-awasair"/></svg>
+        <span class="brand-text"><strong>WASAIR</strong><small>Lebih Awal, Lebih Aman</small></span>
+      </a>
+
+      <nav class="side-nav" aria-label="Navigasi utama">
+        <a class="nav-item" href="#beranda" data-nav="beranda"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg><span>Beranda</span></a>
+        <a class="nav-item" href="#grafik" data-nav="grafik"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg><span>Grafik</span></a>
+        <a class="nav-item" href="#notifikasi" data-nav="notifikasi"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg><span>Notifikasi</span><i class="nav-badge" data-unread-badge aria-label="notifikasi belum dibaca">3</i></a>
+        <a class="nav-item" href="#pengaturan" data-nav="pengaturan"><svg class="icon" aria-hidden="true"><use href="#i-gear"/></svg><span>Pengaturan</span></a>
+      </nav>
+
+      <section class="mqtt-card" aria-label="Status koneksi broker MQTT">
+        <p class="mqtt-title"><i class="status-dot" aria-hidden="true"></i>Broker MQTT</p>
+        <strong id="mqttStatus">Terhubung</strong>
+        <small>Pembaruan terakhir</small>
+        <time id="lastUpdate">--:--:--</time>
+      </section>
+
+      <div class="sidebar-scene" aria-hidden="true">
+        <svg class="scene-art" viewBox="0 0 232 340" preserveAspectRatio="xMidYMax slice">
+          <defs>
+            <linearGradient id="sceneLake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c79c2"/><stop offset="1" stop-color="#174f8a"/></linearGradient>
+            <linearGradient id="sceneFade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#082448" stop-opacity="0"/><stop offset=".45" stop-color="#071f40" stop-opacity=".82"/><stop offset="1" stop-color="#061c3a"/></linearGradient>
+          </defs>
+          <path d="M0 150 38 118l30 15 42-40 40 32 38-24 44 26v213H0Z" fill="#285f9b" opacity=".5"/>
+          <path d="M0 186 48 150l46 24 46-36 50 30 42-22v194H0Z" fill="#1b4c84"/>
+          <g fill="#1d6a79"><circle cx="10" cy="214" r="14"/><circle cx="34" cy="206" r="16"/><circle cx="60" cy="212" r="13"/><circle cx="84" cy="220" r="11"/></g>
+          <g fill="#25807d"><circle cx="22" cy="222" r="11"/><circle cx="48" cy="219" r="12"/><circle cx="72" cy="226" r="9"/></g>
+          <g fill="#1b6574"><circle cx="168" cy="222" r="10"/><circle cx="190" cy="214" r="13"/><circle cx="214" cy="208" r="15"/><circle cx="236" cy="214" r="13"/></g>
+          <rect y="226" width="232" height="54" fill="url(#sceneLake)"/>
+          <g stroke="#7fb8ea" stroke-linecap="round" opacity=".45" stroke-width="2"><path d="M150 236h44M172 246h40M160 258h30"/></g>
+          <path d="M0 278c56-18 140 16 232-12v74H0Z" fill="#0a2a50"/>
+          <g fill="#1d6aa6" opacity=".95"><path d="M-6 228c18-34 34-58 30-92 26 32 20 74-10 108Z"/><path d="M-10 268c28-22 52-30 76-24-22 22-48 32-76 30Z"/></g>
+          <path d="M8 232c10-22 12-48 14-80" fill="none" stroke="#2a86c6" stroke-width="2" opacity=".55"/>
+          <g fill="#1a64a0" opacity=".95"><path d="M240 300c-30-10-46-30-48-58 30 10 48 30 48 58Z"/><path d="M238 330c-26 0-46-12-54-32 24 2 44 12 54 32Z"/></g>
+          <rect y="232" width="232" height="108" fill="url(#sceneFade)"/>
+        </svg>
+        <p class="scene-text">Pantau air,<br>jaga keselamatan,<br>untuk masa depan.</p>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="mobile-header">
+        <a class="brand brand--compact" href="#beranda" data-nav="beranda" aria-label="AWASAIR, ke Beranda">
+          <svg class="logo" aria-hidden="true"><use href="#logo-awasair"/></svg>
+          <span class="brand-text"><strong>WASAIR</strong><small>Lebih Awal, Lebih Aman</small></span>
+        </a>
+        <span class="online-pill"><svg class="icon" aria-hidden="true"><use href="#i-wifi"/></svg><span data-device-status>Online</span></span>
+      </header>
+
+      <header class="topbar">
+        <div class="greeting">
+          <h1>Halo, <span id="greetName">Warga</span> <span class="wave" aria-hidden="true">👋</span></h1>
+          <p>Pantau kondisi air dan lingkungan sekitar secara real-time.</p>
+        </div>
+        <div class="topbar-tools">
+          <div class="clock-widget">
+            <svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg>
+            <span><b id="clockTime">--:--</b><small id="clockDate">—</small></span>
+          </div>
+          <div class="device-chip">
+            <span class="device-icon"><svg class="icon" aria-hidden="true"><use href="#i-wifi"/></svg></span>
+            <span><b>AWASAIR</b><small data-device-status>Online</small></span>
+          </div>
+          <div class="profile">
+            <button class="profile-button" id="profileButton" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="profileMenu" aria-label="Menu profil">
+              <svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>
+            </button>
+            <div class="profile-menu" id="profileMenu" role="menu" hidden>
+              <div class="profile-summary"><b id="profileName">Warga</b><small id="profileRole">Mode lihat saja</small></div>
+              <button class="menu-item" type="button" role="menuitem" data-profile-action="auth" id="authItem">Masuk sebagai admin</button>
+              <button class="menu-item" type="button" role="menuitem" data-profile-action="notify">Aktifkan notifikasi browser</button>
+              <button class="menu-item" type="button" role="menuitem" data-profile-action="console">Konsol AwasLink (teknisi)</button>
+              <button class="menu-item" type="button" role="menuitem" data-profile-action="help">Bantuan</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="content" id="content" tabindex="-1">
+        <!-- ============================== BERANDA -->
+        <section class="page" id="page-beranda" data-title="Beranda" aria-label="Beranda">
+          <section class="hero" aria-label="Status sungai saat ini">
+            <div class="hero-status" id="heroStatus" data-state="danger" aria-live="polite">
+              <span class="hero-label">Status Sungai</span>
+              <span class="state-icon" aria-hidden="true"><svg class="icon"><use id="stateIconUse" href="#i-alert"/></svg></span>
+              <strong class="state-text" id="statusText">BAHAYA</strong>
+              <span class="buzzer-pill" id="buzzerPill" data-tone="danger"><svg class="icon" aria-hidden="true"><use id="buzzerIconUse" href="#i-siren"/></svg><span id="buzzerPillText">Buzzer aktif</span></span>
+            </div>
+            <div class="hero-metrics">
+              <article class="metric-card">
+                <span class="metric-icon" aria-hidden="true"><svg class="icon"><use href="#i-waves"/></svg></span>
+                <span class="metric-title">Ketinggian Air</span>
+                <div class="metric-value"><b id="levelValue">245</b><small>cm</small><em class="metric-delta" id="levelDelta" title="Perubahan 30 menit terakhir"><svg class="icon" aria-hidden="true"><use href="#i-arrow-up"/></svg><span id="levelDeltaText">+12 cm</span></em></div>
+                <p class="metric-note">Ambang Siaga <span data-alert-text>200</span> cm · Bahaya <span data-danger-text>240</span> cm</p>
+              </article>
+              <article class="metric-card">
+                <span class="metric-icon" aria-hidden="true"><svg class="icon"><use href="#i-drop"/></svg></span>
+                <span class="metric-title">Kondisi Hujan</span>
+                <div class="metric-value"><b class="metric-word" id="rainValue">Ringan</b><svg class="metric-illus" aria-hidden="true"><use href="#i-cloud-rain"/></svg></div>
+                <p class="metric-note">Kategori: Ringan / Sedang / Lebat</p>
+              </article>
+            </div>
+          </section>
+
+          <div class="dash-grid">
+            <div class="dash-col dash-main">
+              <article class="card chart-card">
+                <header class="card-head">
+                  <h2 class="card-title" id="chartTitle">Grafik Ketinggian Air <span class="chart-range-text" id="chartRangeText">(6 Jam Terakhir)</span></h2>
+                  <div class="seg" role="group" aria-label="Rentang waktu grafik">
+                    <button class="seg-btn is-active" type="button" data-range="6" aria-pressed="true">6 Jam</button>
+                    <button class="seg-btn" type="button" data-range="12" aria-pressed="false">12 Jam</button>
+                    <button class="seg-btn" type="button" data-range="24" aria-pressed="false">24 Jam</button>
+                  </div>
+                  <select class="range-select" id="rangeSelect" aria-label="Rentang waktu grafik">
+                    <option value="6">6 Jam</option><option value="12">12 Jam</option><option value="24">24 Jam</option>
+                  </select>
+                </header>
+                <div class="chart-box"><canvas id="levelChart" role="img" aria-label="Grafik ketinggian air"></canvas></div>
+                <ul class="legend" aria-hidden="true">
+                  <li><i class="l-level"></i>Ketinggian air (cm)</li>
+                  <li><i class="l-danger"></i>Batas Bahaya</li>
+                  <li><i class="l-alert"></i>Batas Siaga</li>
+                </ul>
+              </article>
+
+              <section class="card features" aria-label="Keunggulan AWASAIR">
+                <div class="feature"><span class="feature-icon" aria-hidden="true"><svg class="icon"><use href="#i-gauge"/></svg></span><b>Real-time Monitoring</b><small>Data sensor diperbarui secara berkala</small></div>
+                <div class="feature"><span class="feature-icon" aria-hidden="true"><svg class="icon"><use href="#i-bell"/></svg></span><b>Notifikasi Cepat</b><small>Peringatan langsung saat ada perubahan</small></div>
+                <div class="feature"><span class="feature-icon" aria-hidden="true"><svg class="icon"><use href="#i-shield"/></svg></span><b>Akurasi Tinggi</b><small>Sensor IoT &amp; MQTT</small></div>
+                <div class="feature"><span class="feature-icon" aria-hidden="true"><svg class="icon"><use href="#i-trend"/></svg></span><b>Mudah Digunakan</b><small>Akses dari mana saja</small></div>
+              </section>
+            </div>
+
+            <div class="dash-col dash-side">
+              <article class="card notif-card">
+                <header class="card-head">
+                  <h2 class="card-title"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg>Notifikasi Terbaru</h2>
+                  <a class="link-more" href="#notifikasi" data-nav="notifikasi">Lihat Semua<svg class="icon" aria-hidden="true"><use href="#i-chevron-right"/></svg></a>
+                </header>
+                <ul class="notif-list" id="recentList"></ul>
+              </article>
+
+              <article class="card map-card">
+                <header class="card-head">
+                  <h2 class="card-title"><button class="collapse-btn" id="mapToggle" type="button" aria-expanded="true" aria-controls="mapBody"><svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg>Lokasi Sensor</button></h2>
+                </header>
+                <div class="map-body" id="mapBody">
+                  <svg class="map-art" viewBox="0 0 400 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                    <rect width="400" height="170" fill="#e7eee8"/>
+                    <g fill="#dde7df"><path d="M20 10h80v46H20zM130 4h70v52h-70zM230 12h64v40h-64zM318 8h70v50h-70zM12 118h76v44H12zM300 118h90v46h-90z"/></g>
+                    <g fill="#cfe6d4"><path d="M118 122h66v40h-66zM214 4h10v30h-10z"/></g>
+                    <g fill="none" stroke="#fff" stroke-linecap="round"><path stroke-width="7" d="M-10 64 410 40M60-10l40 190M262-10l-30 190"/><path stroke-width="4" d="M-10 112 410 96M170-10l18 190M330-10l-22 190M-10 18l160 30M240 150l170-30"/><path stroke-width="2.5" d="M110 70l-30 100M300 70l60 100M40 90l120-10M200 110l90 30"/></g>
+                    <path d="M-10 120C60 112 120 120 180 108S300 70 410 52V82C320 96 260 130 186 134S70 140-10 150Z" fill="#9ec9f1"/>
+                    <path d="M-10 120C60 112 120 120 180 108S300 70 410 52" fill="none" stroke="#88baea" stroke-width="2"/>
+                    <g stroke="#fff" stroke-width="5" stroke-linecap="round"><path d="M88 104l6 40M268 74l10 40"/></g>
+                  </svg>
+                  <span class="map-pin" aria-hidden="true"></span>
+                  <span class="map-label"><b>Sungai A</b><small>Kec. Laweyan, Surakarta</small></span>
+                </div>
+                <footer class="map-foot">
+                  <svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg>
+                  <span id="nodeLabel">Node: awasair/sungai</span>
+                  <button class="link-more" type="button" id="mapDetail">Titik pantau 1<svg class="icon" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>
+                </footer>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================== GRAFIK -->
+        <section class="page" id="page-grafik" data-title="Grafik" aria-labelledby="grafikTitle" hidden>
+          <div class="page-head">
+            <div><h1 id="grafikTitle">Grafik &amp; Riwayat</h1><p>Analisis perubahan ketinggian air dari waktu ke waktu.</p></div>
+            <span class="live-badge" data-conn-badge><i aria-hidden="true"></i><span>Data langsung</span></span>
+          </div>
+          <article class="card history-card">
+            <header class="card-head">
+              <div><h2 class="card-title">Riwayat Ketinggian Air</h2><p class="card-sub">Ambang batas Siaga dan Bahaya ditampilkan pada grafik.</p></div>
+              <select class="select" id="historyRange" aria-label="Rentang grafik riwayat">
+                <option value="6">6 jam terakhir</option><option value="12">12 jam terakhir</option><option value="24">24 jam terakhir</option>
+              </select>
+            </header>
+            <div class="chart-box chart-box--lg"><canvas id="historyChart" role="img" aria-label="Grafik riwayat ketinggian air"></canvas></div>
+            <ul class="legend" aria-hidden="true">
+              <li><i class="l-level"></i>Ketinggian air (cm)</li>
+              <li><i class="l-danger"></i>Batas Bahaya</li>
+              <li><i class="l-alert"></i>Batas Siaga</li>
+            </ul>
+          </article>
+          <div class="stats-grid">
+            <article class="card stat"><small>Rata-rata ketinggian</small><b id="statAvg">— cm</b><span>Dalam rentang terpilih</span></article>
+            <article class="card stat"><small>Ketinggian maksimum</small><b id="statMax">— cm</b><span id="statMaxNote">—</span></article>
+            <article class="card stat"><small>Status sensor</small><b class="text-success" id="statSensor">—</b><span id="statSensorNote">Update setiap 5–10 detik</span></article>
+          </div>
+          <p class="disclaimer">Data diambil dari riwayat AwasLink (disimpan di server). Titik grafik diperkecil otomatis untuk rentang panjang.</p>
+        </section>
+
+        <!-- ============================== NOTIFIKASI -->
+        <section class="page" id="page-notifikasi" data-title="Notifikasi" aria-labelledby="notifTitle" hidden>
+          <div class="page-head">
+            <div><h1 id="notifTitle">Notifikasi</h1><p>Catatan perubahan status dan kejadian pada sistem AWASAIR.</p></div>
+            <button class="btn-primary" type="button" id="markAllRead">Tandai semua dibaca</button>
+          </div>
+          <article class="card notif-page">
+            <header class="card-head">
+              <h2 class="card-title">Riwayat Peringatan</h2>
+              <select class="select" id="notifFilter" aria-label="Saring notifikasi">
+                <option value="all">Semua status</option><option value="danger">Bahaya</option><option value="warning">Siaga</option><option value="success">Normal</option><option value="info">Sistem</option>
+              </select>
+            </header>
+            <ul class="notif-list notif-list--full" id="allList"></ul>
+            <p class="empty-state" id="emptyState" hidden>Tidak ada notifikasi untuk status ini.</p>
+          </article>
+        </section>
+
+        <!-- ============================== PENGATURAN -->
+        <section class="page" id="page-pengaturan" data-title="Pengaturan" aria-labelledby="setTitle" hidden>
+          <div class="page-head">
+            <div><h1 id="setTitle">Pengaturan Sistem</h1><p>Atur ambang peringatan dan kendali buzzer prototipe.</p></div>
+            <span class="live-badge" id="roleBadge"><i aria-hidden="true"></i><span>Mode lihat saja</span></span>
+          </div>
+          <div class="settings-grid">
+            <article class="card settings-card">
+              <div class="settings-head"><span class="settings-icon" aria-hidden="true"><svg class="icon"><use href="#i-flag"/></svg></span><div><h2>Ambang Ketinggian Air</h2><p>Sesuaikan dengan hasil kalibrasi lokasi sensor.</p></div></div>
+              <form id="thresholdForm" novalidate>
+                <label class="field"><span>Ambang Siaga (cm)</span><span class="input-unit"><input id="alertInput" type="number" inputmode="numeric" min="1" max="399" step="1" value="200" required><em>cm</em></span></label>
+                <label class="field"><span>Ambang Bahaya (cm)</span><span class="input-unit"><input id="dangerInput" type="number" inputmode="numeric" min="2" max="400" step="1" value="240" required><em>cm</em></span></label>
+                <button class="btn-primary btn-block" type="submit">Simpan Ambang Batas</button>
+                <p class="form-feedback" id="thresholdFeedback" aria-live="polite"></p>
+              </form>
+            </article>
+            <article class="card settings-card">
+              <div class="settings-head"><span class="settings-icon" aria-hidden="true"><svg class="icon"><use href="#i-gear"/></svg></span><div><h2>Kontrol Aktuator</h2><p>Perintah dikirim ke alat lewat MQTT. Nilai berubah setelah alat mengirim konfirmasi (ack).</p></div></div>
+              <div class="setting-row">
+                <div><b id="buzzerLabel">Buzzer Peringatan</b><small id="buzzerDesc">Buzzer diizinkan aktif saat bahaya</small></div>
+                <button class="switch" type="button" role="switch" id="buzzerSwitch" aria-checked="true" aria-labelledby="buzzerLabel" aria-describedby="buzzerDesc"></button>
+              </div>
+            </article>
+            <article class="card settings-card settings-wide">
+              <div class="settings-head"><span class="settings-icon" aria-hidden="true"><svg class="icon"><use href="#i-plug"/></svg></span><div><h2>Koneksi Perangkat</h2><p>Status konektivitas dashboard.</p></div></div>
+              <div class="setting-row"><div><b>Server AwasLink</b><small>Koneksi real-time dashboard (WebSocket)</small></div><span class="chip-ok" id="serverChip">Terhubung</span></div>
+              <div class="setting-row"><div><b>Node sensor</b><small id="nodeTopic">awasair/sungai</small></div><span class="chip-ok" id="nodeChip">Online</span></div>
+              <div class="setting-row"><div><b>Konfigurasi di alat (ack)</b><small id="ackNote">Belum ada konfirmasi dari alat</small></div><span class="chip-wait" id="ackChip">Menunggu</span></div>
+              <p class="disclaimer">Logika keselamatan (status dan buzzer) tetap berjalan di ESP32 walaupun dashboard atau internet terputus.</p>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 AWASAIR · Prototipe monitoring air berbasis IoT</span>
+        <span><i aria-hidden="true"></i><span id="footerMode">Terhubung ke AwasLink</span></span>
+      </footer>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Navigasi bawah">
+    <a class="bn-item" href="#beranda" data-nav="beranda"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg><span>Beranda</span></a>
+    <a class="bn-item" href="#grafik" data-nav="grafik"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg><span>Grafik</span></a>
+    <a class="bn-item" href="#notifikasi" data-nav="notifikasi"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg><span>Notifikasi</span><i class="bn-badge" data-unread-badge aria-label="notifikasi belum dibaca">3</i></a>
+    <a class="bn-item" href="#pengaturan" data-nav="pengaturan"><svg class="icon" aria-hidden="true"><use href="#i-gear"/></svg><span>Pengaturan</span></a>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <dialog class="login-dialog" id="loginDialog">
+    <form method="dialog" id="loginForm">
+      <h2>Masuk sebagai admin</h2>
+      <p>Diperlukan untuk mengubah ambang batas dan buzzer.</p>
+      <label class="field"><span>Username</span><span class="input-unit"><input name="username" autocomplete="username" required></span></label>
+      <label class="field"><span>Password</span><span class="input-unit"><input name="password" type="password" autocomplete="current-password" required></span></label>
+      <p class="form-feedback" data-tone="error" id="loginError"></p>
+      <div class="row"><button class="btn-ghost" type="button" id="loginCancel">Batal</button><button class="btn-primary" type="submit">Masuk</button></div>
+    </form>
+  </dialog>
+  <script src="app.js"></script>
+</body>
+</html>
