@@ -28,6 +28,31 @@ test('level tidak valid menjadi ERROR, bukan aman', () => {
   assert.equal(hitungStatus(undefined, T), 'ERROR');
 });
 
+test('aturan hujan: hujan lebat selalu BAHAYA, walau air belum naik', () => {
+  assert.equal(hitungStatus(100, T, null, 5, 'lebat'), 'BAHAYA');      // lebat, air rendah
+  assert.equal(hitungStatus(250, T, null, 5, 'lebat'), 'BAHAYA');      // lebat, air tinggi
+  assert.equal(hitungStatus(100, T, null, 5, 'sedang'), 'NORMAL');     // sedang, air rendah = aman
+  assert.equal(hitungStatus(210, T, null, 5, 'sedang'), 'SIAGA');      // sedang, air di ambang siaga
+  assert.equal(hitungStatus(245, T, null, 5, 'sedang'), 'BAHAYA');     // sedang, air di ambang bahaya
+  for (const h of ['kering', 'ringan', 'sedang', 'lebat']) {
+    assert.equal(hitungStatus(245, T, null, 5, h), 'BAHAYA');          // air bahaya, hujan apa pun
+  }
+});
+
+test('aturan hujan: setelah hujan lebat reda, status kembali mengikuti air', () => {
+  assert.equal(hitungStatus(100, T, 'BAHAYA', 5, 'sedang'), 'NORMAL');
+  assert.equal(hitungStatus(210, T, 'BAHAYA', 5, 'ringan'), 'SIAGA');
+  assert.equal(hitungStatus(NaN, T, null, 5, 'lebat'), 'ERROR');       // sensor air gagal tetap ERROR
+});
+
+test('histeresis kategori hujan: makin basah langsung, makin kering lewat batas + 100', () => {
+  assert.equal(kategoriHujan(1400, 'sedang'), 'lebat');
+  assert.equal(kategoriHujan(1550, 'lebat'), 'lebat');   // belum lewat 1500 + 100
+  assert.equal(kategoriHujan(1600, 'lebat'), 'sedang');
+  assert.equal(kategoriHujan(2550, 'sedang'), 'sedang');
+  assert.equal(kategoriHujan(2600, 'sedang'), 'ringan');
+});
+
 test('kategori hujan: nilai makin kecil makin basah', () => {
   assert.equal(kategoriHujan(4095), 'kering');
   assert.equal(kategoriHujan(3000), 'ringan');
