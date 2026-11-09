@@ -1,0 +1,108 @@
+/* =====================================================================
+   Landing page AWASAIR. Muncul di atas dashboard; saat "Mulai" ditekan,
+   panelnya menyusut menjadi sidebar kiri dan logo berpindah ke posisi brand sidebar.
+   ===================================================================== */
+.landing { display: none; }
+html.landing-on .landing, html.landing-back .landing { display: block; }
+html.landing-on body, html.landing-back body { overflow: hidden; }
+
+/* Dashboard di belakang landing: disembunyikan, lalu muncul saat transisi */
+html.landing-on .main { opacity: 0; }
+html.landing-on .sidebar > *:not(.brand) { opacity: 0; }
+html.landing-reveal .main { opacity: 1; transition: opacity .7s ease .45s; }
+html.landing-reveal .sidebar > *:not(.brand) { opacity: 1; transition: opacity .6s ease .7s; }
+
+.landing {
+  --k: 1.8; /* skala brand landing terhadap brand sidebar */
+  position: fixed; left: 0; top: 0; z-index: 100;
+  width: 100%; height: 100vh; height: 100dvh; overflow: hidden;
+  background: linear-gradient(180deg, #143f78 0%, #0e3365 48%, #082448 100%);
+  box-shadow: 8px 0 30px rgba(8, 36, 72, .12);
+  transition: width 1s cubic-bezier(.65, 0, .25, 1), height 1s cubic-bezier(.65, 0, .25, 1), opacity .35s ease;
+}
+.landing.is-done { opacity: 0; }
+.landing-stage { position: absolute; left: 0; top: 0; width: 100vw; height: 100%; }
+
+/* Latar */
+.landing-glow { position: absolute; inset: 0; transition: opacity .5s;
+  background:
+    radial-gradient(60% 50% at 50% 38%, rgba(51, 189, 247, .28), transparent 70%),
+    radial-gradient(40% 40% at 85% 15%, rgba(31, 116, 214, .35), transparent 70%); }
+.landing-drops { position: absolute; inset: 0; pointer-events: none; transition: opacity .4s; }
+.landing-drops i { position: absolute; top: -40px; left: var(--x); width: 2px; height: var(--h); border-radius: 2px;
+  background: linear-gradient(180deg, transparent, rgba(127, 225, 252, .65)); opacity: 0;
+  animation: ld-fall var(--t) linear var(--d) infinite; }
+@keyframes ld-fall { 0% { transform: translateY(0); opacity: 0; } 10% { opacity: .9; } 100% { transform: translateY(110vh); opacity: 0; } }
+
+.landing-waves { position: absolute; left: 0; bottom: 0; width: 200%; height: 34vh; min-height: 190px; max-height: 320px; transition: opacity .4s; }
+.landing-waves path { transform-box: fill-box; }
+.landing-waves .w1 { animation: ld-wave 26s linear infinite; }
+.landing-waves .w2 { animation: ld-wave 18s linear infinite reverse; }
+.landing-waves .w3 { animation: ld-wave 12s linear infinite; }
+@keyframes ld-wave { to { transform: translateX(-50%); } }
+.landing-waves-wrap { position: absolute; inset: auto 0 0 0; height: 34vh; min-height: 190px; max-height: 320px; overflow: hidden; transition: opacity .4s; }
+.landing-waves-wrap .landing-waves { height: 100%; }
+
+/* Isi tengah */
+.landing-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 24px 12vh; text-align: center; color: #fff; }
+.landing-brand {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: calc(12px * var(--k)); color: #fff; transform-origin: 50% 50%;
+  transition: transform 1s cubic-bezier(.65, 0, .25, 1);
+  animation: ld-rise .9s cubic-bezier(.2, .7, .2, 1) both;
+}
+.landing-brand .logo-wrap { position: relative; display: grid; place-items: center; }
+.landing-brand .logo { position: relative; width: calc(64px * var(--k)); height: calc(72px * var(--k)); animation: ld-float 4.5s ease-in-out infinite; filter: drop-shadow(0 12px 28px rgba(51, 189, 247, .45)); }
+.landing.is-leaving .landing-brand .logo { animation: none; filter: none; }
+.landing-brand .ring { position: absolute; left: 50%; top: 50%; width: calc(64px * var(--k)); height: calc(64px * var(--k)); margin: calc(-32px * var(--k)) 0 0 calc(-32px * var(--k));
+  border: 1.5px solid rgba(127, 225, 252, .5); border-radius: 50%; opacity: 0; animation: ld-ring 3.6s ease-out infinite; transition: opacity .3s; }
+.landing-brand .ring:nth-child(2) { animation-delay: 1.2s; }
+.landing-brand .ring:nth-child(3) { animation-delay: 2.4s; }
+.landing.is-leaving .ring { animation: none; opacity: 0; }
+.landing-brand .brand-text strong { display: block; font: 700 calc(26px * var(--k))/1.05 var(--font-brand); letter-spacing: calc(1.5px * var(--k)); }
+.landing-brand .brand-text small { display: block; margin-top: calc(6px * var(--k)); font-size: calc(11px * var(--k)); color: #c8dcf6; white-space: nowrap; }
+
+@keyframes ld-rise { from { opacity: 0; transform: translateY(28px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes ld-float { 50% { transform: translateY(-9px); } }
+@keyframes ld-ring { 0% { transform: scale(.7); opacity: 0; } 18% { opacity: .75; } 100% { transform: scale(2.6); opacity: 0; } }
+
+.landing-lead { max-width: 520px; margin: 30px 0 0; font-size: 17px; line-height: 1.6; color: #d6e6fb; animation: ld-rise .9s cubic-bezier(.2, .7, .2, 1) .35s both; }
+.landing-start {
+  position: relative; margin-top: 30px; display: inline-flex; align-items: center; gap: 12px;
+  padding: 16px 34px; border: 0; border-radius: 999px; cursor: pointer;
+  background: linear-gradient(100deg, #2a8bf5, #1569dc); color: #fff; font: 700 17px var(--font-body);
+  box-shadow: 0 14px 34px rgba(22, 119, 248, .5);
+  transition: transform .2s, box-shadow .2s, opacity .3s;
+  animation: ld-rise .9s cubic-bezier(.2, .7, .2, 1) .55s both;
+}
+.landing-start::after { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 2px solid rgba(127, 225, 252, .7); animation: ld-pulse 2.2s ease-out infinite; }
+@keyframes ld-pulse { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(1.35, 1.7); opacity: 0; } }
+.landing-start:hover { transform: translateY(-2px); box-shadow: 0 18px 40px rgba(22, 119, 248, .6); }
+.landing-start:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+.landing-start .icon { width: 20px; height: 20px; transition: transform .2s; }
+.landing-start:hover .icon { transform: translateX(4px); }
+
+.landing-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 34px 0 0; padding: 0; list-style: none; animation: ld-rise .9s cubic-bezier(.2, .7, .2, 1) .75s both; }
+.landing-chips li { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: #e3eefc; background: rgba(255, 255, 255, .09); border: 1px solid rgba(255, 255, 255, .16); backdrop-filter: blur(4px); }
+.landing-chips i { width: 8px; height: 8px; border-radius: 50%; background: #27d9a7; box-shadow: 0 0 0 3px rgba(39, 217, 167, .22); }
+
+/* Saat menyusut: semua selain brand memudar */
+.landing.is-leaving .landing-lead,
+.landing.is-leaving .landing-start,
+.landing.is-leaving .landing-chips,
+.landing.is-leaving .landing-glow,
+.landing.is-leaving .landing-drops,
+.landing.is-leaving .landing-waves-wrap { opacity: 0; pointer-events: none; transition: opacity .35s ease; animation: none; }
+.landing.is-leaving .landing-start::after { animation: none; }
+
+@media (max-width: 600px) {
+  .landing { --k: 1.35; }
+  .landing-lead { font-size: 15px; margin-top: 24px; }
+  .landing-start { padding: 14px 28px; font-size: 16px; }
+}
+@media (max-height: 640px) { .landing-chips { display: none; } .landing-lead { margin-top: 18px; } }
+@media (prefers-reduced-motion: reduce) {
+  .landing, .landing-brand { transition-duration: .01s; }
+  .landing *, .landing *::after { animation: none !important; }
+  html.landing-reveal .main, html.landing-reveal .sidebar > *:not(.brand) { transition-duration: .01s; transition-delay: 0s; }
+}

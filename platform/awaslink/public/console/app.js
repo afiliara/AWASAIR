@@ -113,7 +113,6 @@ async function render() {
     if (!p[0]) return await viewHome();
     if (p[0] === 'new') return viewNew();
     if (p[0] === 'd') return await viewDevice(p[1], p[2] || 'dash');
-    if (p[0] === 'notif') return await viewNotif();
     if (p[0] === 'settings') return await viewSettings();
     app.innerHTML = '<p class="empty">Halaman tidak ditemukan.</p>';
   } catch (e) {

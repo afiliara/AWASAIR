@@ -9,7 +9,13 @@
   <link rel="icon" href="assets/logo-awasair.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="live.css">
+  <link rel="stylesheet" href="landing.css">
   <link rel="manifest" href="manifest.webmanifest">
+  <script>
+    /* Landing hanya tampil sekali per sesi; setelah tombol Mulai, muat ulang (mis. login) langsung ke dashboard. */
+    try { if (!sessionStorage.getItem("awasair_started")) document.documentElement.classList.add("landing-on"); }
+    catch (e) { document.documentElement.classList.add("landing-on"); }
+  </script>
 </head>
 <body>
   <!-- Sprite ikon dan logo (dipakai ulang lewat <use>) -->
@@ -47,6 +53,33 @@
     <symbol id="i-logout" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 4.5h-4a1.5 1.5 0 0 0-1.5 1.5v12a1.5 1.5 0 0 0 1.5 1.5h4M15 8l4 4-4 4M19 12H9.5"/></g></symbol>
     <symbol id="i-login" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4.5h4a1.5 1.5 0 0 1 1.5 1.5v12a1.5 1.5 0 0 1-1.5 1.5h-4M9 8l-4 4 4 4M5 12h9.5"/></g></symbol>
   </svg>
+
+  <div class="landing" id="landing" role="dialog" aria-label="Selamat datang di AWASAIR">
+    <div class="landing-stage">
+      <div class="landing-glow" aria-hidden="true"></div>
+      <div class="landing-drops" id="landingDrops" aria-hidden="true"></div>
+      <div class="landing-waves-wrap" aria-hidden="true">
+        <svg class="landing-waves" viewBox="0 0 2880 220" preserveAspectRatio="none">
+          <path class="w1" fill="rgba(33,145,242,.30)" d="M0 70 C 180 15, 540 125, 720 70 C 900 15, 1260 125, 1440 70 C 1620 15, 1980 125, 2160 70 C 2340 15, 2700 125, 2880 70 V220 H0 Z"/>
+          <path class="w2" fill="rgba(127,225,252,.22)" d="M0 105 C 180 50, 540 160, 720 105 C 900 50, 1260 160, 1440 105 C 1620 50, 1980 160, 2160 105 C 2340 50, 2700 160, 2880 105 V220 H0 Z"/>
+          <path class="w3" fill="#0a2a50" d="M0 140 C 180 85, 540 195, 720 140 C 900 85, 1260 195, 1440 140 C 1620 85, 1980 195, 2160 140 C 2340 85, 2700 195, 2880 140 V220 H0 Z"/>
+        </svg>
+      </div>
+      <div class="landing-center">
+        <div class="landing-brand" id="landingBrand">
+          <span class="logo-wrap"><i class="ring"></i><i class="ring"></i><i class="ring"></i><svg class="logo" aria-hidden="true"><use href="#logo-awasair"/></svg></span>
+          <span class="brand-text"><strong>AWASAIR</strong><small>Lebih Awal, Lebih Aman</small></span>
+        </div>
+        <p class="landing-lead">Sistem peringatan dini banjir dan luapan air berbasis IoT. Pantau ketinggian air dan kondisi hujan secara real-time.</p>
+        <button class="landing-start" id="landingStart" type="button">Mulai<svg class="icon" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>
+        <ul class="landing-chips" aria-label="Keunggulan">
+          <li><i aria-hidden="true"></i>Pantau real-time</li>
+          <li><i aria-hidden="true"></i>Peringatan dini</li>
+          <li><i aria-hidden="true"></i>Akses dari mana saja</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 
   <div class="app-shell">
     <aside class="sidebar" aria-label="Menu samping">
@@ -342,5 +375,6 @@
     </form>
   </dialog>
   <script src="app.js"></script>
+  <script src="landing.js"></script>
 </body>
 </html>
