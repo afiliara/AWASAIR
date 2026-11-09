@@ -1,15 +1,19 @@
 /* =====================================================================
    AWASAIR — Sistem Peringatan Dini Banjir & Luapan Air
-   Font dibundel lokal (SIL Open Font License, lihat assets/fonts/)
+   Font dibundel lokal (SIL Open Font License, lihat assets/fonts/): Inter untuk semua teks, Space Grotesk untuk tulisan AWASAIR.
    ===================================================================== */
-@font-face { font-family: "Manrope"; font-style: normal; font-weight: 500; font-display: swap; src: url("assets/fonts/manrope-latin-500-normal.woff2") format("woff2"); }
-@font-face { font-family: "Manrope"; font-style: normal; font-weight: 600; font-display: swap; src: url("assets/fonts/manrope-latin-600-normal.woff2") format("woff2"); }
-@font-face { font-family: "Manrope"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/manrope-latin-700-normal.woff2") format("woff2"); }
-@font-face { font-family: "Manrope"; font-style: normal; font-weight: 800; font-display: swap; src: url("assets/fonts/manrope-latin-800-normal.woff2") format("woff2"); }
-@font-face { font-family: "DM Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("assets/fonts/dm-sans-latin-400-normal.woff2") format("woff2"); }
-@font-face { font-family: "DM Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url("assets/fonts/dm-sans-latin-500-normal.woff2") format("woff2"); }
-@font-face { font-family: "DM Sans"; font-style: normal; font-weight: 600; font-display: swap; src: url("assets/fonts/dm-sans-latin-600-normal.woff2") format("woff2"); }
-@font-face { font-family: "DM Sans"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/dm-sans-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("assets/fonts/inter-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url("assets/fonts/inter-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("assets/fonts/inter-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/inter-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 800; font-display: swap; src: url("assets/fonts/inter-latin-800-normal.woff2") format("woff2"); }
+@font-face { font-family: "ID Grotesk"; font-style: normal; font-weight: 400; font-display: swap; src: url("assets/fonts/id-grotesk/IDGrotesk-Regular.ttf") format("truetype"); }
+@font-face { font-family: "ID Grotesk"; font-style: normal; font-weight: 500; font-display: swap; src: url("assets/fonts/id-grotesk/IDGrotesk-Medium.ttf") format("truetype"); }
+@font-face { font-family: "ID Grotesk"; font-style: normal; font-weight: 600; font-display: swap; src: url("assets/fonts/id-grotesk/IDGrotesk-Semibold.ttf") format("truetype"); }
+@font-face { font-family: "ID Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/id-grotesk/IDGrotesk-Bold.ttf") format("truetype"); }
+@font-face { font-family: "Schibsted Grotesk"; font-style: normal; font-weight: 600; font-display: swap; src: url("assets/fonts/schibsted-grotesk-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Schibsted Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/schibsted-grotesk-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/space-grotesk-latin-700-normal.woff2") format("woff2"); }
 
 :root {
   --ink: #0f2a52;
@@ -27,8 +31,10 @@
   --radius: 18px;
   --shadow: 0 10px 30px rgba(27, 72, 140, .08);
   --shadow-sm: 0 4px 14px rgba(27, 72, 140, .07);
-  --font-head: "Manrope", "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-head: "ID Grotesk", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-body: "ID Grotesk", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-sub: "ID Grotesk", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-brand: "ID Grotesk", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --hero-bg:
     linear-gradient(90deg, rgba(7, 36, 78, .82) 0%, rgba(8, 46, 94, .5) 30%, rgba(12, 70, 130, .12) 56%, rgba(12, 70, 130, 0) 72%),
     url("https://images.unsplash.com/photo-1437482078695-73f5ca6c96e2?auto=format&fit=crop&w=1600&q=80") center 50% / cover no-repeat,
@@ -50,7 +56,9 @@ body {
     linear-gradient(160deg, #e9f1fd 0%, #f3f7fe 46%, #ebf2fd 100%);
   background-attachment: fixed;
 }
-h1, h2, h3 { margin: 0; font-family: var(--font-head); color: var(--ink); letter-spacing: -.01em; }
+h1 { font-family: var(--font-head); }
+h2, h3 { font-family: var(--font-sub); letter-spacing: -.015em; }
+h1, h2, h3 { margin: 0; color: var(--ink); letter-spacing: -.01em; }
 p { margin: 0; }
 a { color: inherit; text-decoration: none; }
 button, input, select { font: inherit; color: inherit; }
@@ -73,7 +81,7 @@ button { cursor: pointer; }
 }
 .brand { display: flex; align-items: center; gap: 10px; margin: 2px 6px 30px; color: #fff; }
 .brand .logo { width: 51px; height: 57px; flex: 0 0 auto; }
-.brand-text strong { display: block; font: 800 25px/1.05 var(--font-head); letter-spacing: .5px; }
+.brand-text strong { display: block; font: 700 25px/1.05 var(--font-brand); letter-spacing: .5px; }
 .brand-text small { display: block; margin-top: 5px; font-size: 10px; color: #c8dcf6; white-space: nowrap; }
 .side-nav { display: grid; gap: 8px; }
 .nav-item {
@@ -126,14 +134,6 @@ button { cursor: pointer; }
 .profile-button { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: linear-gradient(135deg, #eef5ff, #dcebff); color: #1d5fb8; display: grid; place-items: center; }
 .profile-button .icon { width: 22px; height: 22px; }
 .profile-button:hover { filter: brightness(.98); }
-.profile-menu { position: absolute; right: 0; top: calc(100% + 10px); z-index: 40; width: 240px; padding: 8px; background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 18px 40px rgba(12, 44, 89, .16); }
-.profile-menu[hidden] { display: none; }
-.profile-summary { padding: 10px 12px 12px; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
-.profile-summary b { display: block; }
-.profile-summary small { color: var(--muted); font-size: 11.5px; }
-.menu-item { display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: 10px; background: none; text-align: left; font-size: 13px; }
-.menu-item:hover, .menu-item:focus-visible { background: #f0f6ff; }
-
 /* ------------------------------------------------------------- hero */
 .hero {
   position: relative; isolation: isolate; overflow: hidden;
@@ -196,7 +196,7 @@ button { cursor: pointer; }
 
 .chart-card { flex: 1 1 auto; display: flex; flex-direction: column; }
 .chart-card .card-title { display: block; }
-.chart-box { position: relative; flex: 1 1 auto; min-height: 280px; }
+.chart-box { position: relative; flex: 1 1 auto; min-height: 340px; }
 .chart-box--lg { min-height: 380px; }
 .chart-box canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; }
 .seg { display: flex; gap: 4px; padding: 4px; background: #eef4fc; border-radius: 12px; }
@@ -240,7 +240,7 @@ button { cursor: pointer; }
 /* peta */
 .map-card { flex: 1 1 auto; display: flex; flex-direction: column; }
 .map-card .card-head { margin-bottom: 12px; }
-.collapse-btn { display: flex; align-items: center; gap: 8px; padding: 0; border: 0; background: none; font: 800 16px var(--font-head); color: var(--ink); }
+.collapse-btn { display: flex; align-items: center; gap: 8px; padding: 0; border: 0; background: none; font: 700 16px var(--font-sub); color: var(--ink); }
 .collapse-btn .icon { width: 18px; height: 18px; transition: transform .2s; }
 .collapse-btn[aria-expanded="false"] .icon { transform: rotate(-90deg); }
 .map-body { position: relative; flex: 1 1 auto; min-height: 150px; border-radius: 14px; overflow: hidden; border: 1px solid #e0e9f3; background: #e7eee8; }
@@ -259,13 +259,6 @@ button { cursor: pointer; }
 .map-foot .link-more { margin-left: auto; font-weight: 500; }
 
 /* fitur */
-.features { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 18px 8px; }
-.feature { padding: 4px 18px; border-right: 1px solid var(--line); }
-.feature:last-child { border-right: 0; }
-.feature-icon { width: 46px; height: 46px; margin-bottom: 12px; border-radius: 50%; display: grid; place-items: center; background: #e6f1ff; color: #1677f8; }
-.feature-icon .icon { width: 23px; height: 23px; }
-.feature b { display: block; font-size: 13.5px; font-weight: 700; }
-.feature small { display: block; margin-top: 4px; font-size: 12px; line-height: 1.45; color: var(--muted); }
 
 /* ------------------------------------------------------------- halaman lain */
 .page[hidden] { display: none; }
@@ -344,8 +337,6 @@ button { cursor: pointer; }
 @media (max-width: 960px) and (min-width: 861px) {
   .greeting h1 { font-size: 23px; }
   .device-chip { padding-right: 12px; }
-  .features { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 16px; }
-  .feature:nth-child(2) { border-right: 0; }
 }
 @media (max-width: 860px) {
   .app-shell { display: block; background: none; }
@@ -394,8 +385,6 @@ button { cursor: pointer; }
   .chart-card { order: 1; }
   .notif-card { order: 2; }
   .map-card { order: 3; }
-  .features { order: 4; grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 16px; }
-  .feature:nth-child(2) { border-right: 0; }
   .card { padding: 16px; border-radius: 16px; }
   .card-title { font-size: 15px; }
   .seg { display: none; }

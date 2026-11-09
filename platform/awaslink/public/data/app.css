@@ -1,16 +1,22 @@
+@font-face { font-family: "ID Grotesk"; font-style: normal; font-weight: 400; font-display: swap; src: url("/assets/fonts/id-grotesk/IDGrotesk-Regular.ttf") format("truetype"); }
+@font-face { font-family: "ID Grotesk"; font-style: normal; font-weight: 500; font-display: swap; src: url("/assets/fonts/id-grotesk/IDGrotesk-Medium.ttf") format("truetype"); }
+@font-face { font-family: "ID Grotesk"; font-style: normal; font-weight: 600; font-display: swap; src: url("/assets/fonts/id-grotesk/IDGrotesk-Semibold.ttf") format("truetype"); }
+@font-face { font-family: "ID Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("/assets/fonts/id-grotesk/IDGrotesk-Bold.ttf") format("truetype"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("/assets/fonts/inter-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url("/assets/fonts/inter-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("/assets/fonts/inter-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 700; font-display: swap; src: url("/assets/fonts/inter-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 800; font-display: swap; src: url("/assets/fonts/inter-latin-800-normal.woff2") format("woff2"); }
+@font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("/assets/fonts/space-grotesk-latin-700-normal.woff2") format("woff2"); }
 :root {
+  color-scheme: light;
   --bg: #f4f6f9; --card: #ffffff; --fg: #1d2430; --muted: #6b7686; --border: #dfe4ea;
   --grid: rgba(110, 120, 135, .18); --accent: #1f7a8c; --accent-fg: #fff;
   --ok: #1e9e5a; --warn: #d99a00; --danger: #d63b3b; --code: #eef1f5;
   --shadow: 0 1px 2px rgba(0,0,0,.05), 0 2px 8px rgba(0,0,0,.04);
 }
-@media (prefers-color-scheme: dark) {
-  :root { --bg: #11151b; --card: #1a2028; --fg: #e4e9f0; --muted: #8e99a8; --border: #2a323d;
-    --grid: rgba(150, 160, 175, .14); --accent: #3fb0c4; --accent-fg: #0b1d22; --code: #232a34;
-    --shadow: none; }
-}
 * { box-sizing: border-box; }
-html, body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 "ID Grotesk", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 code, pre, .mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12.5px; }

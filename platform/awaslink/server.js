@@ -570,6 +570,19 @@ route('GET', /^\/api\/devices\/([\w-]+)\/history\.csv$/, viewer(withDevice((req,
   send(res, 200, 'waktu,key,value\n' + rows.map((r) => `${new Date(r.ts).toISOString()},${r.key},"${String(r.value).replace(/"/g, '""')}"`).join('\n') + '\n',
     'text/csv; charset=utf-8', { 'Content-Disposition': `attachment; filename="${d.id}_history.csv"` });
 })));
+// CSV data air untuk warga: kolom sudah dipivot (waktu, ketinggian, hujan, status), tanpa data teknis (ADC, konfigurasi buzzer).
+route('GET', /^\/api\/devices\/([\w-]+)\/air\.csv$/, viewer(withDevice((req, res, q, m, d) => {
+  const minutes = Math.min(Number(q.minutes) || 1440, CFG.historyDays * 1440);
+  const rows = db.prepare(`SELECT ts/1000 AS sec, MIN(ts) AS ts,
+      MAX(CASE WHEN key='level' THEN value END) AS level,
+      MAX(CASE WHEN key='hujan' THEN value END) AS hujan,
+      MAX(CASE WHEN key='status' THEN value END) AS status
+    FROM history WHERE device_id=? AND key IN ('level','hujan','status') AND ts>=?
+    GROUP BY sec HAVING level IS NOT NULL ORDER BY sec`).all(d.id, Date.now() - minutes * 60000);
+  const cell = (v) => (v == null ? '' : `"${String(v).replace(/"/g, '""')}"`);
+  const body = 'waktu,ketinggian_air_cm,hujan,status\n' + rows.map((r) => [new Date(r.ts).toISOString(), r.level, cell(r.hujan), cell(r.status)].join(',')).join('\n') + '\n';
+  send(res, 200, '\ufeff' + body, 'text/csv; charset=utf-8', { 'Content-Disposition': `attachment; filename="data_air_${d.id}.csv"` });
+})));
 route('GET', /^\/api\/devices\/([\w-]+)\/events$/, viewer(withDevice((req, res, q, m, d) => {
   json(res, db.prepare('SELECT * FROM events WHERE device_id=? ORDER BY ts DESC LIMIT ?').all(d.id, Math.min(Number(q.limit) || 50, 500)));
 })));

@@ -84,16 +84,11 @@ function notify(m) {
 // ---------------------------------------------------------------------------
 async function loadMe() {
   ME = await api('GET', '/api/me');
-  $('#auth').innerHTML = ME.admin
-    ? `<button class="btn sm" id="logout">Keluar (${esc(ME.user)})</button>`
-    : '<button class="btn sm primary" id="login">Login admin</button>';
   document.querySelectorAll('.admin-only').forEach((e) => (e.hidden = !ME.admin));
-  $('#logout')?.addEventListener('click', async () => { await api('POST', '/api/logout'); location.reload(); });
-  $('#login')?.addEventListener('click', showLogin);
 }
 function showLogin() {
   const bg = document.createElement('div'); bg.className = 'modal-bg';
-  bg.innerHTML = `<form class="card modal"><h3>Login admin AwasLink</h3>
+  bg.innerHTML = `<form class="card modal"><h3>Login admin AWASAIR</h3>
     <div class="f"><label>Username</label><input type="text" name="username" autocomplete="username" required></div>
     <div class="f"><label>Password</label><input type="password" name="password" autocomplete="current-password" required></div>
     <p class="hint" id="err"></p>

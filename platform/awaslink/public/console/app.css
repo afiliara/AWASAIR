@@ -1,13 +1,21 @@
+@font-face { font-family: "ID Grotesk"; font-style: normal; font-weight: 400; font-display: swap; src: url("/assets/fonts/id-grotesk/IDGrotesk-Regular.ttf") format("truetype"); }
+@font-face { font-family: "ID Grotesk"; font-style: normal; font-weight: 500; font-display: swap; src: url("/assets/fonts/id-grotesk/IDGrotesk-Medium.ttf") format("truetype"); }
+@font-face { font-family: "ID Grotesk"; font-style: normal; font-weight: 600; font-display: swap; src: url("/assets/fonts/id-grotesk/IDGrotesk-Semibold.ttf") format("truetype"); }
+@font-face { font-family: "ID Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("/assets/fonts/id-grotesk/IDGrotesk-Bold.ttf") format("truetype"); }
+@font-face { font-family: "Schibsted Grotesk"; font-style: normal; font-weight: 600; font-display: swap; src: url("/assets/fonts/schibsted-grotesk-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Schibsted Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("/assets/fonts/schibsted-grotesk-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("/assets/fonts/inter-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url("/assets/fonts/inter-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("/assets/fonts/inter-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 700; font-display: swap; src: url("/assets/fonts/inter-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 800; font-display: swap; src: url("/assets/fonts/inter-latin-800-normal.woff2") format("woff2"); }
+@font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("/assets/fonts/space-grotesk-latin-700-normal.woff2") format("woff2"); }
 :root {
+  color-scheme: light;
   --bg: #f4f6f9; --card: #ffffff; --fg: #1d2430; --muted: #6b7686; --border: #dfe4ea;
   --grid: rgba(110, 120, 135, .18); --accent: #2b5fd9; --accent-fg: #fff;
   --ok: #1e9e5a; --warn: #d99a00; --danger: #d63b3b; --code: #eef1f5;
   --shadow: 0 1px 2px rgba(0,0,0,.05), 0 2px 8px rgba(0,0,0,.04);
-}
-@media (prefers-color-scheme: dark) {
-  :root { --bg: #11151b; --card: #1a2028; --fg: #e4e9f0; --muted: #8e99a8; --border: #2a323d;
-    --grid: rgba(150, 160, 175, .14); --accent: #6d97ff; --accent-fg: #0b1430; --code: #232a34;
-    --shadow: none; }
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -133,3 +141,49 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 .banner.critical { background: var(--danger); } .banner.warning { background: var(--warn); } .banner.info { background: var(--accent); }
 .edit-table input, .edit-table select { padding: 5px 7px; font-size: 13px; }
 .edit-table td { padding: 5px 4px; }
+
+/* ======================= Tampilan baru konsol admin (selaras dengan dashboard utama) ======================= */
+:root {
+  --bg: #eef4fc; --fg: #0f2a52; --muted: #6b83a7; --border: #e0e9f6; --accent: #1677f8;
+  --ok: #12a87a; --warn: #f2a11f; --danger: #ef4057;
+  --shadow: 0 10px 30px rgba(27, 72, 140, .08);
+  --font-head: "ID Grotesk", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-brand: "ID Grotesk", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+html, body { font-family: "ID Grotesk", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 14.5px; background: var(--bg); }
+h1 { font-family: var(--font-head); }
+h2, h3 { font-family: var(--font-head); }
+.brand { font-family: var(--font-head); }
+h1 { font-size: 26px; font-weight: 800; }
+h2 { font-weight: 800; }
+
+header.top { background: linear-gradient(100deg, #143f78, #0e3365 60%, #082448); border: 0; box-shadow: 0 6px 24px rgba(8, 36, 72, .18); }
+header.top .in { padding: 12px 20px; gap: 26px; }
+.brand { color: #fff; gap: 11px; font-size: 21px; font-weight: 800; letter-spacing: .6px; }
+.brand strong { font-family: var(--font-brand); font-weight: 700; letter-spacing: .5px; }
+.brand img { display: block; }
+.role-tag { padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28); color: #cfe3ff; font: 700 11px/1.4 var(--font-head); letter-spacing: .12em; text-transform: uppercase; }
+nav.main { gap: 6px; }
+nav.main a { color: #cfe0f7; font-weight: 600; padding: 8px 14px; border-radius: 10px; transition: background-color .2s, color .2s; }
+nav.main a:hover { background: rgba(255,255,255,.09); color: #fff; text-decoration: none; }
+nav.main a.on { background: linear-gradient(100deg, #1f74d6, #165fb8); color: #fff; box-shadow: 0 6px 14px rgba(4, 25, 56, .3); }
+header.top .live { color: #cfe0f7; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.1); }
+header.top .live::before { background: #8aa4c8; }
+header.top .live.on::before { background: #27d9a7; box-shadow: 0 0 0 3px rgba(39, 217, 167, .25); }
+
+main { max-width: 1180px; padding: 28px 20px 70px; }
+.sub { color: var(--muted); }
+.card { border-radius: 18px; border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow); }
+a.card { transition: transform .18s, box-shadow .18s, border-color .18s; }
+a.card:hover { transform: translateY(-2px); border-color: #bcd3f5; box-shadow: 0 16px 34px rgba(27, 72, 140, .14); text-decoration: none; }
+.grid.cards { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+.btn { border-radius: 12px; padding: 9px 16px; font-weight: 600; }
+.btn.primary { background: linear-gradient(100deg, #1a7cf8, #0e62d2); border: 0; box-shadow: 0 8px 18px rgba(22, 119, 248, .25); }
+.btn.primary:hover { filter: brightness(1.06); text-decoration: none; }
+.badge { padding: 3px 11px; font-weight: 700; letter-spacing: .03em; }
+.tabs a.on { border-color: var(--accent); font-weight: 700; }
+input[type=text], input[type=password], input[type=number], input[type=url], select, textarea { border-radius: 10px; background: #f7faff; }
+input:focus, select:focus, textarea:focus { outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); border-color: var(--accent); }
+.big { font-family: var(--font-head); }
+.dot.on { background: var(--ok); }
+@media (max-width: 640px) { header.top .in { gap: 10px; padding: 10px 14px; } nav.main { order: 3; flex-basis: 100%; } main { padding: 20px 14px 60px; } }

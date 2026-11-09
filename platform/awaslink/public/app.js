@@ -27,6 +27,7 @@
   const state = {
     device: null, // perangkat AwasLink yang ditampilkan
     admin: false,
+    roleKnown: false, // peran (admin/warga) baru diketahui setelah /api/me selesai
     wsOk: false,
     points: [], // riwayat ketinggian air [{t, v}] 24 jam terakhir
     values: {}, // nilai terakhir per datastream {key: {v, ts}}
@@ -258,7 +259,26 @@
     $("#greetName").textContent = state.admin ? "Admin" : "Warga";
     $("#profileName").textContent = state.admin ? "Admin AWASAIR" : "Warga";
     $("#profileRole").textContent = state.admin ? "Dapat mengubah pengaturan" : "Mode lihat saja";
-    $("#authItem").textContent = state.admin ? "Keluar" : "Masuk sebagai admin";
+    $("#authLabel").textContent = state.admin ? "Keluar" : "Masuk sebagai admin";
+    $("#authIconUse").setAttribute("href", state.admin ? "#i-logout" : "#i-login");
+    $("#authItem").classList.toggle("is-danger", state.admin);
+    applyRole();
+  }
+
+  // Elemen .admin-only (menu teknis, Data & Ekspor, Konsol) hanya tampil untuk admin; .public-only hanya untuk warga.
+  function applyRole() {
+    $$(".admin-only").forEach((el) => { el.hidden = !state.admin; });
+    $$(".public-only").forEach((el) => { el.hidden = state.admin; });
+  }
+
+  // Unduh data air 24 jam terakhir sebagai CSV (boleh untuk semua pengunjung).
+  function downloadCsv() {
+    if (!state.device) return toast("Data belum siap, coba lagi sebentar.");
+    const link = document.createElement("a");
+    link.href = `/api/devices/${encodeURIComponent(state.device.id)}/air.csv?minutes=1440`;
+    link.download = "";
+    link.click();
+    toast("Mengunduh data air 24 jam terakhir (CSV).");
   }
 
   function renderStats() {
@@ -292,7 +312,7 @@
   }
 
   /* ------------------------------------------------------------ grafik (canvas) */
-  const FONT = '"DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
+  const FONT = '"ID Grotesk", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
   const charts = [];
 
   function roundRect(ctx, x, y, w, h, r) {
@@ -487,6 +507,7 @@
   function showPage(name, { focus = false } = {}) {
     if (name === "dashboard") name = "beranda";
     if (!PAGES.includes(name)) name = "beranda";
+    if (name === "pengaturan" && state.roleKnown && !state.admin) name = "beranda"; // pengaturan hanya untuk admin
     PAGES.forEach((p) => { $("#page-" + p).hidden = p !== name; });
     $$("[data-nav]").forEach((a) => {
       if (!a.classList.contains("nav-item") && !a.classList.contains("bn-item")) return;
@@ -564,6 +585,7 @@
     btn.setAttribute("aria-expanded", String(open));
     $("#mapBody").hidden = !open;
   });
+  $("#csvButton").addEventListener("click", downloadCsv);
   $("#mapDetail").addEventListener("click", () => toast(`Titik pantau: ${state.device?.name || "-"} (${state.device?.topic || "-"})`));
 
   // login admin
@@ -599,8 +621,9 @@
       if (!("Notification" in window)) return toast("Browser ini tidak mendukung notifikasi.");
       const r = await Notification.requestPermission();
       toast(r === "granted" ? "Notifikasi browser aktif. Peringatan muncul selama halaman ini terbuka." : "Izin notifikasi ditolak.");
-    } else if (action === "console") location.href = "/console/";
-    else if (action === "data") location.href = "/data/";
+    } else if (action === "csv") downloadCsv();
+    else if (action === "console" && state.admin) location.href = "/console/";
+    else if (action === "data" && state.admin) location.href = "/data/";
     else if (action === "help") toast("Status dihitung oleh alat (ESP32). Abu-abu berarti data tidak tersedia, bukan aman.");
   });
   document.addEventListener("click", (e) => { if (!profileMenu.hidden && !e.target.closest(".profile")) setMenu(false); });
@@ -686,6 +709,9 @@
     try {
       const me = await api("GET", "/api/me");
       state.admin = me.admin;
+      state.roleKnown = true;
+      applyRole();
+      showPage(location.hash.slice(1));
       const devices = await api("GET", "/api/devices");
       const want = new URLSearchParams(location.search).get("device");
       state.device = devices.find((d) => d.id === want) || devices.find((d) => d.config?.contract === "awasair-v1") || devices[0];

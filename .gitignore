@@ -5,3 +5,6 @@ backend/data/
 *.db-wal
 *.db-shm
 secrets.h
+
+# Font ID Grotesk (lisensi Personal Use Only): jangan dipublikasikan ke repo
+platform/awaslink/public/assets/fonts/id-grotesk/

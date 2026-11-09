@@ -14,7 +14,7 @@ Tampilan responsif untuk desktop, tablet, dan HP. Tanpa framework dan tanpa libr
 - `app.js` — data contoh, status sungai otomatis, grafik canvas, routing halaman, notifikasi, pengaturan, dan menu profil.
 - `assets/logo-awasair.svg` — logo huruf A (juga dipakai sebagai favicon).
 - `assets/hero-scene.svg` — ilustrasi cadangan hero, tampil bila foto online tidak termuat.
-- `assets/fonts/` — font Manrope dan DM Sans (lisensi SIL Open Font License, lihat file OFL di folder ini).
+- `assets/fonts/` — font Inter (semua teks) dan Space Grotesk (tulisan AWASAIR) (lisensi SIL Open Font License, lihat file OFL di folder ini).
 
 ## Fitur yang berjalan
 - Navigasi antarhalaman lewat sidebar (desktop) atau navigasi bawah (HP). Alamat memakai hash (`#beranda`, `#grafik`, `#notifikasi`, `#pengaturan`), sehingga tombol Back browser ikut bekerja.
