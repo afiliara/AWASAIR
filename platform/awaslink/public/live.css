@@ -1,4 +1,15 @@
 /* Tambahan untuk versi terhubung (AwasLink). style.css asli dari tim UI/UX tidak diubah. */
+
+/* Logo sidebar: logo A di atas, lalu tulisan AWASAIR dan slogan di bawahnya (rata tengah) */
+.brand--stack { flex-direction: column; align-items: center; text-align: center; gap: 12px; margin: 6px 6px 30px; }
+.brand--stack .logo { width: 64px; height: 72px; }
+.brand--stack .brand-text strong { font-size: 26px; letter-spacing: 1.5px; }
+.brand--stack .brand-text small { margin-top: 6px; font-size: 11px; }
+@media (max-width: 1180px) {
+  .brand--stack .logo { width: 54px; height: 61px; }
+  .brand--stack .brand-text strong { font-size: 22px; letter-spacing: 1px; }
+  .brand--stack .brand-text small { font-size: 10px; }
+}
 .hero-status[data-state="offline"] .state-icon,
 .hero-status[data-state="error"] .state-icon { background: #7b8aa3; box-shadow: 0 0 0 6px rgba(123, 138, 163, .28); }
 .buzzer-pill[data-tone="offline"] { background: rgba(15, 42, 82, .72); box-shadow: none; }
