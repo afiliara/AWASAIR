@@ -70,10 +70,10 @@ function loadDevices() {
   devices.clear();
   for (const row of db.prepare('SELECT * FROM devices').all()) {
     const d = { ...row, config: JSON.parse(row.config), values: {}, online: false, evState: {} };
-    if (d.config.contract === 'awasair-v1' && !d.config.datalog) {
-      d.config.datalog = awasairTemplate().datalog;
-      db.prepare('UPDATE devices SET config=? WHERE id=?').run(JSON.stringify(d.config), d.id);
-    }
+    let ubah = false;
+    if (d.config.contract === 'awasair-v1' && !d.config.datalog) { d.config.datalog = awasairTemplate().datalog; ubah = true; }
+    if (migrasiAturanHujan(d.config)) ubah = true;
+    if (ubah) db.prepare('UPDATE devices SET config=? WHERE id=?').run(JSON.stringify(d.config), d.id);
     for (const v of db.prepare('SELECT key, value, ts FROM latest WHERE device_id=?').all(row.id)) d.values[v.key] = { v: v.value, ts: v.ts };
     devices.set(row.id, d);
   }
@@ -119,15 +119,34 @@ function awasairTemplate() {
       { id: 'w9', type: 'slider', key: 'bahaya', title: 'Ambang Bahaya', w: 1 },
       { id: 'w10', type: 'log', title: 'Notifikasi Terbaru', w: 2 },
     ],
+    // Status dari alat sudah menggabungkan air + hujan (hujan lebat = BAHAYA), lihat docs/mqtt-contract.md.
+    rules: 2,
     events: [
-      { id: 'e1', key: 'status', op: '==', value: 'BAHAYA', level: 'critical', message: 'BAHAYA! Ketinggian air {{level}} cm. Segera waspada dan bersiap evakuasi.', telegram: true },
+      { id: 'e1', key: 'status', op: '==', value: 'BAHAYA', level: 'critical', message: BAHAYA_MSG, telegram: true },
       { id: 'e2', key: 'status', op: '==', value: 'SIAGA', level: 'warning', message: 'SIAGA: ketinggian air naik ke {{level}} cm (hujan: {{hujan}}).', telegram: true },
-      { id: 'e3', key: 'status', op: '==', value: 'NORMAL', level: 'info', message: 'Kondisi sungai kembali NORMAL ({{level}} cm).', telegram: false },
+      { id: 'e3', key: 'status', op: '==', value: 'NORMAL', level: 'info', message: 'Kondisi sungai kembali NORMAL ({{level}} cm, hujan: {{hujan}}).', telegram: false },
       { id: 'e4', key: 'status', op: '==', value: 'ERROR', level: 'warning', message: 'Sensor ketinggian gagal membaca (ERROR). Data tidak dapat dipercaya, cek HC-SR04.', telegram: true },
-      { id: 'e5', key: 'hujan', op: '==', value: 'lebat', level: 'warning', message: 'Hujan lebat terdeteksi di lokasi sensor.', telegram: false },
+      { id: 'e5', key: 'hujan', op: '==', value: 'sedang', level: 'info', message: 'Hujan sedang terdeteksi di lokasi sensor ({{level}} cm).', telegram: false },
     ],
     notifyOffline: true,
   };
+}
+
+const BAHAYA_MSG = 'BAHAYA! Ketinggian air {{level}} cm, hujan {{hujan}}. Segera waspada dan bersiap evakuasi.';
+
+// Perbarui aturan bawaan perangkat lama ke aturan status air + hujan (rules 2).
+// Hanya mengganti pesan yang masih bawaan; pesan yang sudah diubah pengguna dibiarkan.
+function migrasiAturanHujan(cfg) {
+  if (cfg.contract !== 'awasair-v1' || (cfg.rules || 1) >= 2) return false;
+  const lama = {
+    e1: 'BAHAYA! Ketinggian air {{level}} cm. Segera waspada dan bersiap evakuasi.',
+    e3: 'Kondisi sungai kembali NORMAL ({{level}} cm).',
+    e5: 'Hujan lebat terdeteksi di lokasi sensor.',
+  };
+  const baru = Object.fromEntries(awasairTemplate().events.map((e) => [e.id, e]));
+  cfg.events = cfg.events.map((e) => (lama[e.id] && e.message === lama[e.id] ? { ...e, ...baru[e.id], telegram: e.telegram } : e));
+  cfg.rules = 2;
+  return true;
 }
 
 function blankTemplate() {

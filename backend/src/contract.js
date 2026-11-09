@@ -19,28 +19,39 @@ export const DEFAULTS = {
   bahaya: 240,
   tinggiPasang: 300,
   histeresis: 5,
+  histeresisHujan: 100, // ADC: kategori hujan baru membaik setelah melewati batas + 100
 };
 
-export function kategoriHujan(adc) {
-  if (adc >= 4000) return 'kering';
-  if (adc >= 2500) return 'ringan';
-  if (adc >= 1500) return 'sedang';
-  return 'lebat';
+// Batas atas ADC tiap kategori (nilai >= batas berarti lebih kering dari kategori itu).
+const BATAS_HUJAN = { lebat: 1500, sedang: 2500, ringan: 4000 };
+
+// prev = kategori sebelumnya (untuk histeresis). Makin basah langsung, makin kering harus lewat batas + margin.
+export function kategoriHujan(adc, prev = null, margin = DEFAULTS.histeresisHujan) {
+  const raw = adc >= 4000 ? 'kering' : adc >= 2500 ? 'ringan' : adc >= 1500 ? 'sedang' : 'lebat';
+  if (prev && HUJAN.indexOf(raw) < HUJAN.indexOf(prev) && adc < BATAS_HUJAN[prev] + margin) return prev;
+  return raw;
 }
 
-// prev = status sebelumnya (untuk histeresis). Naik langsung, turun bertahap.
-export function hitungStatus(level, { siaga, bahaya }, prev = null, hist = DEFAULTS.histeresis) {
+// Status gabungan ketinggian air dan hujan (lihat docs/mqtt-contract.md, "Aturan status"):
+//   - Air: naik langsung saat melewati ambang, turun bertahap dengan histeresis.
+//   - Hujan lebat: selalu BAHAYA, walaupun air belum naik.
+//   - Level tidak terbaca: ERROR (tidak pernah dianggap aman).
+// prev = status sebelumnya, hujan = kategori hujan saat ini.
+export function hitungStatus(level, { siaga, bahaya }, prev = null, hist = DEFAULTS.histeresis, hujan = null) {
   if (!Number.isFinite(level)) return 'ERROR';
   const rank = { NORMAL: 0, SIAGA: 1, BAHAYA: 2 };
   const nama = ['NORMAL', 'SIAGA', 'BAHAYA'];
   let cur = rank[prev] ?? 0;
   const naik = level >= bahaya ? 2 : level >= siaga ? 1 : 0;
-  if (naik >= cur) return nama[naik];
-  while (cur > 0) {
-    const batas = cur === 2 ? bahaya : siaga;
-    if (level < batas - hist) cur--;
-    else break;
+  if (naik >= cur) cur = naik;
+  else {
+    while (cur > 0) {
+      const batas = cur === 2 ? bahaya : siaga;
+      if (level < batas - hist) cur--;
+      else break;
+    }
   }
+  if (hujan === 'lebat') cur = 2;
   return nama[cur];
 }
 

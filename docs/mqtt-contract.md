@@ -65,6 +65,21 @@ Dashboard menampilkan nilai dari `ack`, sehingga yang terlihat selalu sama denga
 
 Histeresis 5 cm agar status tidak berkedip di sekitar ambang. Turun dilakukan satu tingkat demi satu tingkat.
 
+## Aturan status (air + hujan)
+Status akhir menggabungkan ketinggian air dan kategori hujan. Hujan lebat dianggap tanda bahaya
+walaupun air belum naik, karena luapan biasanya menyusul.
+
+| Hujan | Air | Status |
+|---|---|---|
+| lebat | apa pun | **BAHAYA** |
+| kering / ringan / sedang | level < siaga | NORMAL |
+| kering / ringan / sedang | level ≥ siaga | SIAGA |
+| apa pun | level ≥ bahaya | BAHAYA |
+| apa pun | level tidak terbaca | ERROR |
+
+Setelah hujan lebat reda, status kembali mengikuti air (dengan histeresis di atas).
+Implementasi: `hitungStatus(level, ambang, prev, histeresis, hujan)` di `backend/src/contract.js`.
+
 ## Kategori hujan (contoh, wajib dikalibrasi)
 | ADC | Kategori |
 |---|---|
@@ -72,6 +87,20 @@ Histeresis 5 cm agar status tidak berkedip di sekitar ambang. Turun dilakukan sa
 | 2500 sampai 3999 | ringan |
 | 1500 sampai 2499 | sedang |
 | < 1500 | lebat |
+
+Histeresis hujan: kategori langsung memburuk saat ADC turun melewati batas, tetapi baru membaik setelah
+ADC naik melewati batas + 100 (misalnya lebat baru menjadi sedang saat ADC ≥ 1600). Ini mencegah status
+BAHAYA berkedip saat nilai sensor hujan berada di sekitar 1500.
+
+## Buzzer di perangkat
+| Kondisi | Pola |
+|---|---|
+| BAHAYA (termasuk karena hujan lebat) | bunyi terus |
+| SIAGA | bip tiap 1 detik |
+| NORMAL + hujan sedang | bip tiap 3 detik |
+| NORMAL + kering/ringan | diam |
+
+`mute` membisukan semua pola.
 
 ## Akses (ACL)
 | Pengguna | Publish | Subscribe |

@@ -147,7 +147,7 @@
                 <span class="metric-icon" aria-hidden="true"><svg class="icon"><use href="#i-drop"/></svg></span>
                 <span class="metric-title">Kondisi Hujan</span>
                 <div class="metric-value"><b class="metric-word" id="rainValue">Ringan</b><svg class="metric-illus" aria-hidden="true"><use href="#i-cloud-rain"/></svg></div>
-                <p class="metric-note">Kategori: Ringan / Sedang / Lebat</p>
+                <p class="metric-note">Hujan lebat = status BAHAYA</p>
               </article>
             </div>
           </section>
@@ -293,6 +293,15 @@
               <div class="setting-row"><div><b>Node sensor</b><small id="nodeTopic">awasair/sungai</small></div><span class="chip-ok" id="nodeChip">Online</span></div>
               <div class="setting-row"><div><b>Konfigurasi di alat (ack)</b><small id="ackNote">Belum ada konfirmasi dari alat</small></div><span class="chip-wait" id="ackChip">Menunggu</span></div>
               <p class="disclaimer">Logika keselamatan (status dan buzzer) tetap berjalan di ESP32 walaupun dashboard atau internet terputus.</p>
+            </article>
+            <article class="card settings-card settings-wide" aria-labelledby="aturanTitle">
+              <div class="settings-head"><span class="settings-icon" aria-hidden="true"><svg class="icon"><use href="#i-shield"/></svg></span><div><h2 id="aturanTitle">Aturan Status</h2><p>Status dihitung di alat dari ketinggian air dan kondisi hujan.</p></div></div>
+              <div class="setting-row"><div><b>Hujan lebat</b><small>Ketinggian air berapa pun · buzzer bunyi terus</small></div><span class="chip-off">BAHAYA</span></div>
+              <div class="setting-row"><div><b>Air ≥ <span data-danger-text>240</span> cm</b><small>Hujan apa pun · buzzer bunyi terus</small></div><span class="chip-off">BAHAYA</span></div>
+              <div class="setting-row"><div><b>Air ≥ <span data-alert-text>200</span> cm</b><small>Hujan kering, ringan, atau sedang · buzzer bip tiap 1 detik</small></div><span class="chip-wait">SIAGA</span></div>
+              <div class="setting-row"><div><b>Hujan sedang, air di bawah ambang Siaga</b><small>Buzzer bip tiap 3 detik sebagai pengingat</small></div><span class="chip-ok">NORMAL</span></div>
+              <div class="setting-row"><div><b>Kering atau hujan ringan, air di bawah ambang Siaga</b><small>Buzzer diam</small></div><span class="chip-ok">NORMAL</span></div>
+              <p class="disclaimer">Setelah hujan lebat reda, status kembali mengikuti ketinggian air. Sensor air yang gagal membaca selalu tampil ERROR, tidak pernah dianggap aman.</p>
             </article>
           </div>
         </section>

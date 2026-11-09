@@ -18,6 +18,7 @@ const cfg = { mute: false, siaga: DEFAULTS.siaga, bahaya: DEFAULTS.bahaya };
 let level = 120;
 let adc = 4095;
 let status = null;
+let hujanPrev = null;
 let t = 0;
 
 const client = mqtt.connect(url, {
@@ -60,8 +61,8 @@ function nextValues() {
 
 function tick() {
   nextValues();
-  const hujan = kategoriHujan(adc);
-  const baru = hitungStatus(level, cfg, status);
+  const hujan = (hujanPrev = kategoriHujan(adc, hujanPrev));
+  const baru = hitungStatus(level, cfg, status, DEFAULTS.histeresis, hujan);
   if (baru !== status) {
     status = baru;
     pub(TOPICS.status, status, { qos: 1, retain: true });

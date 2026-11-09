@@ -27,18 +27,26 @@ if (!TOKEN) { console.error('Wajib isi --token <auth token perangkat dari AwasLi
 
 const T = { data: `${BASE}/data`, status: `${BASE}/status`, online: `${BASE}/online`, cmd: `${BASE}/cmd`, ack: `${BASE}/ack` };
 const cfg = { mute: false, siaga: 200, bahaya: 240 }; // konfigurasi yang berlaku di "alat"
-let status = null; let level = 120; let adc = 4095; let t = 0;
+let status = null; let hujanPrev = null; let level = 120; let adc = 4095; let t = 0;
 
-const kategoriHujan = (a) => (a >= 4000 ? 'kering' : a >= 2500 ? 'ringan' : a >= 1500 ? 'sedang' : 'lebat');
+// Sama dengan backend/src/contract.js: makin basah langsung, makin kering lewat batas + 100.
+const HUJAN = ['kering', 'ringan', 'sedang', 'lebat'];
+const BATAS_HUJAN = { lebat: 1500, sedang: 2500, ringan: 4000 };
+function kategoriHujan(a, prev) {
+  const raw = a >= 4000 ? 'kering' : a >= 2500 ? 'ringan' : a >= 1500 ? 'sedang' : 'lebat';
+  if (prev && HUJAN.indexOf(raw) < HUJAN.indexOf(prev) && a < BATAS_HUJAN[prev] + 100) return prev;
+  return raw;
+}
 
-// Naik langsung, turun bertahap satu tingkat dengan histeresis (sama dengan contract.js)
-function hitungStatus(lv, prev) {
+// Status gabungan (sama dengan contract.js): air naik langsung, turun bertahap; hujan lebat = BAHAYA.
+function hitungStatus(lv, prev, hujan) {
   if (!Number.isFinite(lv)) return 'ERROR';
   const rank = { NORMAL: 0, SIAGA: 1, BAHAYA: 2 }; const nama = ['NORMAL', 'SIAGA', 'BAHAYA'];
   let cur = rank[prev] ?? 0;
   const naik = lv >= cfg.bahaya ? 2 : lv >= cfg.siaga ? 1 : 0;
-  if (naik >= cur) return nama[naik];
-  while (cur > 0) { if (lv < (cur === 2 ? cfg.bahaya : cfg.siaga) - HIST) cur--; else break; }
+  if (naik >= cur) cur = naik;
+  else while (cur > 0) { if (lv < (cur === 2 ? cfg.bahaya : cfg.siaga) - HIST) cur--; else break; }
+  if (hujan === 'lebat') cur = 2;
   return nama[cur];
 }
 
@@ -86,11 +94,14 @@ client.on('message', (topic, payload) => {
 function tick() {
   if (!client.connected) return;
   nextValues();
-  const hujan = kategoriHujan(adc);
-  const baru = hitungStatus(level, status);
-  if (baru !== status) { status = baru; pub(T.status, status, { qos: 1, retain: true }); }
+  const hujan = (hujanPrev = kategoriHujan(adc, hujanPrev));
+  const baru = hitungStatus(level, status, hujan);
+  const berubah = baru !== status;
+  status = baru;
+  // data dulu, baru status (sama dengan firmware): notifikasi server memakai level terbaru
   if (Number.isFinite(level)) pub(T.data, { level: +level.toFixed(1), jarak: +(TINGGI_PASANG - level).toFixed(1), adc, hujan, status });
   else pub(T.data, { adc, hujan, status });
+  if (berubah) pub(T.status, status, { qos: 1, retain: true });
   console.log(`[sim] ${status.padEnd(6)} level=${Number.isFinite(level) ? level.toFixed(1) : '-'} adc=${adc} ${hujan}${cfg.mute ? ' [mute]' : ''}`);
 
 }

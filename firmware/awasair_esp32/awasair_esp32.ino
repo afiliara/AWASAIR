@@ -76,49 +76,91 @@ float bacaJarakMedian() {
   return v[n / 2];
 }
 
+// Sama dengan backend/src/contract.js: makin basah langsung, makin kering harus lewat batas + HISTERESIS_HUJAN.
+const char* HUJAN_STR[] = {"kering", "ringan", "sedang", "lebat"};
+int hujanIdx = 0;  // 0 kering, 1 ringan, 2 sedang, 3 lebat
+
 const char* hitungKategoriHujan(int adc) {
-  if (adc >= ADC_KERING) return "kering";
-  if (adc >= ADC_RINGAN) return "ringan";
-  if (adc >= ADC_SEDANG) return "sedang";
-  return "lebat";
+  int raw = adc >= ADC_KERING ? 0 : adc >= ADC_RINGAN ? 1 : adc >= ADC_SEDANG ? 2 : 3;
+  const int batas[] = {0, ADC_KERING, ADC_RINGAN, ADC_SEDANG};  // batas atas tiap kategori
+  if (raw < hujanIdx && adc < batas[hujanIdx] + HISTERESIS_HUJAN) raw = hujanIdx;  // tahan agar tidak berkedip
+  hujanIdx = raw;
+  return HUJAN_STR[raw];
 }
 
-// Sama dengan backend/src/contract.js: naik langsung, turun bertahap satu tingkat dengan histeresis.
-Status hitungStatus(float level, Status prev) {
+// Status gabungan air + hujan (sama dengan backend/src/contract.js, docs/mqtt-contract.md "Aturan status"):
+//   - air: naik langsung saat melewati ambang, turun bertahap dengan histeresis
+//   - hujan lebat: selalu BAHAYA walaupun air belum naik
+//   - level tidak terbaca: ERROR (tidak pernah dianggap aman)
+Status hitungStatus(float level, Status prev, bool hujanLebat) {
   if (isnan(level)) return ERR;
   int cur = (prev == ERR) ? 0 : (int)prev;
   int naik = level >= ambangBahaya ? 2 : level >= ambangSiaga ? 1 : 0;
-  if (naik >= cur) return (Status)naik;
-  while (cur > 0) {
-    float batas = (cur == 2) ? ambangBahaya : ambangSiaga;
-    if (level < batas - HISTERESIS) cur--;
-    else break;
+  if (naik >= cur) cur = naik;
+  else {
+    while (cur > 0) {
+      float batas = (cur == 2) ? ambangBahaya : ambangSiaga;
+      if (level < batas - HISTERESIS) cur--;
+      else break;
+    }
   }
+  if (hujanLebat) cur = 2;
   return (Status)cur;
 }
 
+// Jumlah pembacaan gagal berturut-turut sebelum status menjadi ERROR.
+// Satu pembacaan meleset (pantulan liar, benda terlalu dekat) tidak langsung dianggap rusak.
+#define MAKS_GAGAL 3
+int gagalBeruntun = 0;
+
 void ukur() {
   float j = bacaJarakMedian();
-  if (isnan(j)) { jarakCm = NAN; levelCm = NAN; }
-  else { jarakCm = j; levelCm = TINGGI_PASANG - j; }
+  // Lebih jauh dari titik nol/dasar sungai = mustahil secara fisik -> anggap pembacaan gagal
+  if (!isnan(j) && j > TINGGI_PASANG + 10) j = NAN;
+  if (isnan(j)) {
+    if (++gagalBeruntun >= MAKS_GAGAL) { jarakCm = NAN; levelCm = NAN; }  // sensor benar-benar gagal
+    // else: pertahankan nilai terakhir
+  } else {
+    gagalBeruntun = 0;
+    jarakCm = j;
+    levelCm = TINGGI_PASANG - j;
+    if (levelCm < 0) levelCm = 0;
+  }
   long sum = 0;
   for (int i = 0; i < 8; i++) { sum += analogRead(PIN_RAIN); delay(2); }
   rainAdc = sum / 8;
   kategoriHujan = hitungKategoriHujan(rainAdc);
-  Status baru = hitungStatus(levelCm, status);
+  Status baru = hitungStatus(levelCm, status, hujanIdx == 3);
   if (!statusDikenal || baru != status) statusPerluKirim = true;
   status = baru;
   statusDikenal = true;
 }
 
 // ---------------------------------------------------------------- Buzzer (non-blocking)
+// Memakai nada 2 kHz (PWM) agar buzzer AKTIF maupun PASIF sama-sama berbunyi.
+#define NADA_BUZZER 2000
+bool buzzerBunyi = false;
+
+// Pola bunyi (urutan prioritas, yang lebih berbahaya menang):
+//   BAHAYA (air >= ambang bahaya ATAU hujan lebat) : bunyi terus
+//   SIAGA                                          : bip 200 ms tiap 1 detik
+//   hujan lebat saat sensor air ERROR              : bip-bip (2x 150 ms) tiap 2 detik
+//   hujan sedang, status NORMAL                    : bip 150 ms tiap 3 detik
 void updateBuzzer() {
   bool on = false;
   if (!buzzerMute) {
-    if (status == BAHAYA) on = true;                         // kontinu
-    else if (status == SIAGA) on = (millis() % 1000) < 200;  // putus-putus
+    unsigned long t = millis();
+    bool lebat = !strcmp(kategoriHujan, "lebat");
+    bool sedang = !strcmp(kategoriHujan, "sedang");
+    if (status == BAHAYA) on = true;
+    else if (status == SIAGA) on = (t % 1000) < 200;
+    else if (lebat && BUZZER_HUJAN_LEBAT) { unsigned long p = t % 2000; on = p < 150 || (p >= 300 && p < 450); }
+    else if (sedang && BUZZER_HUJAN_SEDANG) on = (t % 3000) < 150;
   }
-  digitalWrite(PIN_BUZZER, on ? HIGH : LOW);
+  if (on == buzzerBunyi) return;  // hanya ubah saat berganti, jangan restart nada tiap loop
+  buzzerBunyi = on;
+  if (on) tone(PIN_BUZZER, NADA_BUZZER);
+  else { noTone(PIN_BUZZER); digitalWrite(PIN_BUZZER, LOW); }
 }
 
 // ---------------------------------------------------------------- LCD
@@ -181,7 +223,7 @@ void onMqttMessage(char* topic, byte* payload, unsigned int len) {
   Serial.printf("[cmd] diterapkan: mute=%d siaga=%.0f bahaya=%.0f\n", buzzerMute, ambangSiaga, ambangBahaya);
   publishAck();  // laporkan konfigurasi yang kini berlaku
 
-  Status baru = hitungStatus(levelCm, status);
+  Status baru = hitungStatus(levelCm, status, hujanIdx == 3);
   if (baru != status) { status = baru; publishStatus(); }
   updateLcd();
 }
@@ -252,8 +294,8 @@ void loop() {
     tUkur = now;
     ukur();
     updateLcd();
+    publishData();                          // data dulu: server membuat notifikasi dengan level terbaru
     if (statusPerluKirim) publishStatus();
-    publishData();
     Serial.printf("level=%.1f cm  jarak=%.1f cm  adc=%d (%s)  status=%s%s\n", levelCm, jarakCm, rainAdc, kategoriHujan,
                   STATUS_STR[status], buzzerMute ? " [mute]" : "");
   }

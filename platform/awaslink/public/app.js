@@ -100,15 +100,24 @@
     $("#stateIconUse").setAttribute("href", STATUS[key].icon);
 
     const muted = num("mute") === 1;
+    const hujan = (str("hujan") || "").toLowerCase();
+    const lv = num("level");
+    const { danger } = thresholds();
+    // Aturan status: hujan lebat = BAHAYA walau air belum naik (docs/mqtt-contract.md)
+    const karenaHujan = key === "danger" && hujan === "lebat" && (lv == null || lv < danger);
     const pill = $("#buzzerPill");
     let tone = key, text = "Kondisi aman", icon = "#i-check";
     if (key === "danger") {
       tone = muted ? "muted" : "danger";
-      text = muted ? "Buzzer dibisukan" : "Buzzer aktif";
+      text = (karenaHujan ? "Hujan lebat · " : "") + (muted ? "buzzer dibisukan" : "buzzer aktif");
+      text = text.charAt(0).toUpperCase() + text.slice(1);
       icon = muted ? "#i-bell-off" : "#i-siren";
     } else if (key === "warning") {
       text = muted ? "Waspada · buzzer dibisukan" : "Waspada kenaikan air";
       icon = "#i-alert";
+    } else if (key === "normal" && hujan === "sedang") {
+      text = muted ? "Hujan sedang · buzzer dibisukan" : "Hujan sedang · buzzer bip";
+      icon = muted ? "#i-bell-off" : "#i-cloud-rain";
     } else if (key === "error") {
       tone = "offline"; text = "Sensor gagal membaca"; icon = "#i-alert";
     } else if (key === "offline") {
@@ -173,7 +182,8 @@
     else if (/ERROR/.test(m)) { kind = "warning"; label = "ERROR"; }
     else if (/hujan/i.test(m)) { kind = "warning"; label = "HUJAN"; }
     else if (e.level === "warning") { kind = "warning"; label = "PERINGATAN"; }
-    const parts = m.split(/(?<=[.!])\s+/);
+    // Judul = kalimat pertama sampai titik ("BAHAYA! Ketinggian air 1.3 cm, hujan lebat."), sisanya detail
+    const parts = m.split(/(?<=\.)\s+/);
     return { id: e.id, kind, label, title: parts[0], detail: parts.slice(1).join(" ") || m, ts: e.ts };
   }
 
