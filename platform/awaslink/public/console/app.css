@@ -187,3 +187,8 @@ input:focus, select:focus, textarea:focus { outline: 2px solid color-mix(in srgb
 .big { font-family: var(--font-head); }
 .dot.on { background: var(--ok); }
 @media (max-width: 640px) { header.top .in { gap: 10px; padding: 10px 14px; } nav.main { order: 3; flex-basis: 100%; } main { padding: 20px 14px 60px; } }
+
+/* Tombol rumah (kembali ke dashboard utama) */
+.home-btn { margin-left: auto; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.28); transition: background-color .2s, transform .2s; }
+.home-btn:hover { background: rgba(255,255,255,.26); transform: translateY(-1px); text-decoration: none; }
+.home-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }

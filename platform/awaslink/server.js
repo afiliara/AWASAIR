@@ -631,7 +631,9 @@ route('GET', /^\/external\/api\/isHardwareConnected$/, (req, res, q) => {
 });
 
 const MIME = { '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8', '.md': 'text/plain; charset=utf-8', '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png' };
-function serveStatic(res, pathname) {
+function serveStatic(req, res, pathname) {
+  // Halaman Data & Ekspor khusus admin; selain admin dikembalikan ke dashboard utama.
+  if (/^\/data(\/|$)/.test(pathname) && !isAdmin(req)) { res.writeHead(302, { Location: '/' }); return res.end(); }
   const pub = path.join(__dirname, 'public');
   if (pathname === '/console' || pathname === '/data') { res.writeHead(301, { Location: pathname + '/' }); return res.end(); }
   let f = path.normalize(path.join(pub, decodeURIComponent(pathname)));
@@ -655,7 +657,7 @@ const server = http.createServer(async (req, res) => {
       if (m) return await r.h(req, res, q, m);
     }
     if (await datalog.handle(req, res, url)) return; // API & halaman Data Logger (ala ThingSpeak)
-    if (req.method === 'GET') return serveStatic(res, url.pathname);
+    if (req.method === 'GET') return serveStatic(req, res, url.pathname);
     fail(res, 404, 'Tidak ditemukan');
   } catch (e) {
     console.error(e);

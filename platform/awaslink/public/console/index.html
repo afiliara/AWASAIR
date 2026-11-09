@@ -12,13 +12,14 @@
 <body>
   <header class="top">
     <div class="in">
-      <a class="brand" href="#/" aria-label="AWASAIR Admin"><img src="/assets/logo-awasair.svg" width="30" height="34" alt=""><strong>AWASAIR</strong><span class="role-tag">Admin</span></a>
+      <a class="brand" href="#/" aria-label="AWASAIR Admin"><img src="/assets/logo-awasair.svg" width="30" height="34" alt=""><strong>AWASAIR</strong><span class="role-tag">Console</span></a>
       <nav class="main" id="nav">
         <a href="#/" data-r="home">Perangkat</a>
         <a href="#/notif" data-r="notif">Notifikasi</a>
         <a href="#/settings" data-r="settings" class="admin-only" hidden>Pengaturan</a>
       </nav>
-      <span class="live" id="ws">offline</span>
+      <span id="ws" class="live" style="display:none" aria-hidden="true"></span>
+      <a class="home-btn" href="/" title="Kembali ke dashboard utama" aria-label="Kembali ke dashboard utama"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 3.2 3 10.3V20a1 1 0 0 0 1 1h5.4v-6.2h5.2V21H20a1 1 0 0 0 1-1v-9.7L12 3.2Z"/></svg></a>
     </div>
   </header>
   <main id="app"></main>

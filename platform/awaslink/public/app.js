@@ -256,7 +256,6 @@
     const rb = $("#roleBadge");
     rb.toggleAttribute("data-off", !state.admin);
     rb.lastElementChild.textContent = state.admin ? "Admin" : "Mode lihat saja";
-    $("#greetName").textContent = state.admin ? "Admin" : "Warga";
     $("#profileName").textContent = state.admin ? "Admin AWASAIR" : "Warga";
     $("#profileRole").textContent = state.admin ? "Dapat mengubah pengaturan" : "Mode lihat saja";
     $("#authLabel").textContent = state.admin ? "Keluar" : "Masuk sebagai admin";
@@ -624,7 +623,6 @@
     } else if (action === "csv") downloadCsv();
     else if (action === "console" && state.admin) location.href = "/console/";
     else if (action === "data" && state.admin) location.href = "/data/";
-    else if (action === "help") toast("Status dihitung oleh alat (ESP32). Abu-abu berarti data tidak tersedia, bukan aman.");
   });
   document.addEventListener("click", (e) => { if (!profileMenu.hidden && !e.target.closest(".profile")) setMenu(false); });
   document.addEventListener("keydown", (e) => {

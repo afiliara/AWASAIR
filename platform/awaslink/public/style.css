@@ -117,10 +117,7 @@ button { cursor: pointer; }
 .mobile-header { display: none; }
 
 .topbar { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
-.greeting { margin-right: auto; min-width: 0; }
-.greeting h1 { font-size: 27px; font-weight: 800; }
-.greeting p { margin-top: 4px; color: var(--muted-2); font-size: 14px; }
-.topbar-tools { display: flex; align-items: center; gap: 14px; }
+.topbar-tools { margin-left: auto; display: flex; align-items: center; gap: 14px; }
 .clock-widget { display: flex; align-items: center; gap: 12px; padding: 6px 10px; }
 .clock-widget .icon { width: 30px; height: 30px; color: #ffb21f; }
 .clock-widget b { display: block; font: 700 16px var(--font-head); font-variant-numeric: tabular-nums; }
@@ -335,7 +332,6 @@ button { cursor: pointer; }
   .clock-widget small { display: none; }
 }
 @media (max-width: 960px) and (min-width: 861px) {
-  .greeting h1 { font-size: 23px; }
   .device-chip { padding-right: 12px; }
 }
 @media (max-width: 860px) {

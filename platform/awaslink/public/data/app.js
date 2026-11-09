@@ -43,12 +43,8 @@ async function api(method, url, body) {
 // ---------------------------------------------------------------------------
 async function loadMe() {
   ME = await api('GET', '/api/me');
-  $('#auth').innerHTML = ME.admin
-    ? `<span class="hint">Masuk sebagai <b>${esc(ME.user)}</b></span> <button class="btn sm" id="logout">Keluar</button>`
-    : '<button class="btn sm primary" id="login">Login admin</button>';
+  if (!ME.admin) { location.replace('/'); return; } // halaman ini khusus admin
   document.querySelectorAll('.admin-only').forEach((el) => (el.hidden = !ME.admin));
-  $('#logout')?.addEventListener('click', async () => { await api('POST', '/api/logout'); await loadMe(); render(); });
-  $('#login')?.addEventListener('click', showLogin);
 }
 
 function showLogin() {
