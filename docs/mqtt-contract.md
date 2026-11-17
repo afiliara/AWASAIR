@@ -90,14 +90,18 @@ Implementasi: `hitungStatus(level, ambang, prev, histeresis, hujan)` di `backend
 
 Histeresis hujan: kategori langsung memburuk saat ADC turun melewati batas, tetapi baru membaik setelah
 ADC naik melewati batas + 100 (misalnya lebat baru menjadi sedang saat ADC ≥ 1600). Ini mencegah status
-BAHAYA berkedip saat nilai sensor hujan berada di sekitar 1500.
+BAHAYA berkedip saat nilai sensor hujan berada di sekitar 1500. Batas + 100 dibatasi maksimal 4095
+(ADC maksimum ESP32), sehingga sensor yang kering penuh (4095) selalu kembali menjadi "kering".
 
 ## Buzzer di perangkat
+Perangkat mengukur sensor tiap 1 detik, sehingga buzzer dan LCD bereaksi dalam sekitar 1 detik.
+`data` tetap dikirim tiap 5 detik, tetapi perubahan status langsung dikirim saat itu juga.
+
 | Kondisi | Pola |
 |---|---|
 | BAHAYA (termasuk karena hujan lebat) | bunyi terus |
-| SIAGA | bip tiap 1 detik |
-| NORMAL + hujan sedang | bip tiap 3 detik |
+| SIAGA | bip tiap 0,5 detik |
+| NORMAL + hujan sedang | bip tiap 1,5 detik |
 | NORMAL + kering/ringan | diam |
 
 `mute` membisukan semua pola.

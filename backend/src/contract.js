@@ -28,7 +28,8 @@ const BATAS_HUJAN = { lebat: 1500, sedang: 2500, ringan: 4000 };
 // prev = kategori sebelumnya (untuk histeresis). Makin basah langsung, makin kering harus lewat batas + margin.
 export function kategoriHujan(adc, prev = null, margin = DEFAULTS.histeresisHujan) {
   const raw = adc >= 4000 ? 'kering' : adc >= 2500 ? 'ringan' : adc >= 1500 ? 'sedang' : 'lebat';
-  if (prev && HUJAN.indexOf(raw) < HUJAN.indexOf(prev) && adc < BATAS_HUJAN[prev] + margin) return prev;
+  // Dibatasi 4095 (ADC maksimum ESP32): tanpa ini "ringan" -> "kering" butuh ADC >= 4100 dan tidak pernah tercapai.
+  if (prev && HUJAN.indexOf(raw) < HUJAN.indexOf(prev) && adc < Math.min(BATAS_HUJAN[prev] + margin, 4095)) return prev;
   return raw;
 }
 

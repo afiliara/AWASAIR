@@ -53,6 +53,12 @@ test('histeresis kategori hujan: makin basah langsung, makin kering lewat batas 
   assert.equal(kategoriHujan(2600, 'sedang'), 'ringan');
 });
 
+test('histeresis hujan: sensor kering penuh (4095) kembali menjadi kering', () => {
+  assert.equal(kategoriHujan(4095, 'ringan'), 'kering');  // dulu tertahan "ringan" karena butuh ADC >= 4100
+  assert.equal(kategoriHujan(4050, 'ringan'), 'ringan');  // masih dalam margin, tetap ditahan
+  assert.equal(kategoriHujan(4095, 'lebat'), 'kering');
+});
+
 test('kategori hujan: nilai makin kecil makin basah', () => {
   assert.equal(kategoriHujan(4095), 'kering');
   assert.equal(kategoriHujan(3000), 'ringan');

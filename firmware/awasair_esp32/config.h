@@ -18,7 +18,8 @@
 #define DEFAULT_SIAGA   200.0f  // cm (bisa diubah lewat cmd)
 #define DEFAULT_BAHAYA  240.0f  // cm (bisa diubah lewat cmd)
 #define HISTERESIS      5.0f    // cm
-#define INTERVAL_MS     5000UL  // publish `data` tiap 5 detik (kontrak: 5-10 detik)
+#define UKUR_MS         1000UL  // ukur sensor tiap 1 detik (buzzer & LCD cepat bereaksi)
+#define INTERVAL_MS     5000UL  // publish `data` tiap 5 detik (kontrak: 5-10 detik); status berubah dikirim langsung
 
 // Kategori hujan (ADC, makin kecil makin basah). WAJIB dikalibrasi.
 // Hujan lebat (ADC < ADC_SEDANG) membuat status BAHAYA walaupun air belum naik (lihat "Aturan status").

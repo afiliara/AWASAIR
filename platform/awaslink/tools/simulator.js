@@ -34,7 +34,7 @@ const HUJAN = ['kering', 'ringan', 'sedang', 'lebat'];
 const BATAS_HUJAN = { lebat: 1500, sedang: 2500, ringan: 4000 };
 function kategoriHujan(a, prev) {
   const raw = a >= 4000 ? 'kering' : a >= 2500 ? 'ringan' : a >= 1500 ? 'sedang' : 'lebat';
-  if (prev && HUJAN.indexOf(raw) < HUJAN.indexOf(prev) && a < BATAS_HUJAN[prev] + 100) return prev;
+  if (prev && HUJAN.indexOf(raw) < HUJAN.indexOf(prev) && a < Math.min(BATAS_HUJAN[prev] + 100, 4095)) return prev;
   return raw;
 }
 

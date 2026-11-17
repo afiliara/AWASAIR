@@ -50,7 +50,7 @@ bool statusDikenal = false;  // false sampai pengukuran pertama
 bool statusPerluKirim = true;
 const char* STATUS_STR[] = {"NORMAL", "SIAGA", "BAHAYA", "ERROR"};
 
-unsigned long tUkur = 0, tMqttRetry = 0, tWifiRetry = 0;
+unsigned long tUkur = 0, tKirim = 0, tMqttRetry = 0, tWifiRetry = 0;
 char clientId[32];
 
 // ---------------------------------------------------------------- Sensor
@@ -83,7 +83,8 @@ int hujanIdx = 0;  // 0 kering, 1 ringan, 2 sedang, 3 lebat
 const char* hitungKategoriHujan(int adc) {
   int raw = adc >= ADC_KERING ? 0 : adc >= ADC_RINGAN ? 1 : adc >= ADC_SEDANG ? 2 : 3;
   const int batas[] = {0, ADC_KERING, ADC_RINGAN, ADC_SEDANG};  // batas atas tiap kategori
-  if (raw < hujanIdx && adc < batas[hujanIdx] + HISTERESIS_HUJAN) raw = hujanIdx;  // tahan agar tidak berkedip
+  // tahan agar tidak berkedip; dibatasi 4095 (ADC maksimum) supaya "kering" tetap bisa tercapai
+  if (raw < hujanIdx && adc < min(batas[hujanIdx] + HISTERESIS_HUJAN, 4095)) raw = hujanIdx;
   hujanIdx = raw;
   return HUJAN_STR[raw];
 }
@@ -143,9 +144,9 @@ bool buzzerBunyi = false;
 
 // Pola bunyi (urutan prioritas, yang lebih berbahaya menang):
 //   BAHAYA (air >= ambang bahaya ATAU hujan lebat) : bunyi terus
-//   SIAGA                                          : bip 200 ms tiap 1 detik
-//   hujan lebat saat sensor air ERROR              : bip-bip (2x 150 ms) tiap 2 detik
-//   hujan sedang, status NORMAL                    : bip 150 ms tiap 3 detik
+//   SIAGA                                          : bip 150 ms tiap 0,5 detik
+//   hujan lebat saat sensor air ERROR              : bip-bip (2x 120 ms) tiap 1 detik
+//   hujan sedang, status NORMAL                    : bip 120 ms tiap 1,5 detik
 void updateBuzzer() {
   bool on = false;
   if (!buzzerMute) {
@@ -153,9 +154,9 @@ void updateBuzzer() {
     bool lebat = !strcmp(kategoriHujan, "lebat");
     bool sedang = !strcmp(kategoriHujan, "sedang");
     if (status == BAHAYA) on = true;
-    else if (status == SIAGA) on = (t % 1000) < 200;
-    else if (lebat && BUZZER_HUJAN_LEBAT) { unsigned long p = t % 2000; on = p < 150 || (p >= 300 && p < 450); }
-    else if (sedang && BUZZER_HUJAN_SEDANG) on = (t % 3000) < 150;
+    else if (status == SIAGA) on = (t % 500) < 150;
+    else if (lebat && BUZZER_HUJAN_LEBAT) { unsigned long p = t % 1000; on = p < 120 || (p >= 240 && p < 360); }
+    else if (sedang && BUZZER_HUJAN_SEDANG) on = (t % 1500) < 120;
   }
   if (on == buzzerBunyi) return;  // hanya ubah saat berganti, jangan restart nada tiap loop
   buzzerBunyi = on;
@@ -289,14 +290,19 @@ void loop() {
   mqtt.loop();
   updateBuzzer();  // dipanggil terus agar pola SIAGA halus
 
+  // Ukur tiap UKUR_MS agar buzzer & LCD cepat bereaksi; kirim `data` ke server tiap INTERVAL_MS,
+  // kecuali status berubah: data + status langsung dikirim saat itu juga.
   unsigned long now = millis();
-  if (tUkur == 0 || now - tUkur >= INTERVAL_MS) {
+  if (tUkur == 0 || now - tUkur >= UKUR_MS) {
     tUkur = now;
     ukur();
     updateLcd();
-    publishData();                          // data dulu: server membuat notifikasi dengan level terbaru
-    if (statusPerluKirim) publishStatus();
-    Serial.printf("level=%.1f cm  jarak=%.1f cm  adc=%d (%s)  status=%s%s\n", levelCm, jarakCm, rainAdc, kategoriHujan,
-                  STATUS_STR[status], buzzerMute ? " [mute]" : "");
+    if (statusPerluKirim || tKirim == 0 || now - tKirim >= INTERVAL_MS) {
+      tKirim = now;
+      publishData();                          // data dulu: server membuat notifikasi dengan level terbaru
+      if (statusPerluKirim) publishStatus();
+      Serial.printf("level=%.1f cm  jarak=%.1f cm  adc=%d (%s)  status=%s%s\n", levelCm, jarakCm, rainAdc, kategoriHujan,
+                    STATUS_STR[status], buzzerMute ? " [mute]" : "");
+    }
   }
 }
